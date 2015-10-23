@@ -16,15 +16,20 @@ export default function(start, length, scale = 'days') {
   var diffUnit = dateMap[scale];
   var dates = [];
   var potentialDate, toAdd;
-  for (var i = 0; i <= length; i++) {
-    toAdd = i * diffUnit;
+  var i = 0;
+  var index = 0;
+  while (i < length) {
+    toAdd = index * diffUnit;
     potentialDate = cloneDate(start);
     // Update our date appropriately
     potentialDate.setDate(potentialDate.getDate() + toAdd);
-    if (scale === 'days' && isWeekend(potentialDate)) {
-      continue;
+    var isDays = scale === 'days';
+    var isAWeekend = isWeekend(potentialDate);
+    if (!isDays || (isDays && !isAWeekend)) {
+      dates.push(potentialDate);
+      i++;
     }
-    dates.push(potentialDate);
+    index++;
   }
   return dates;
 };

@@ -1,14 +1,4 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else if(typeof exports === 'object')
-		exports["cal"] = factory();
-	else
-		root["cal"] = factory();
-})(this, function() {
-return /******/ (function(modules) { // webpackBootstrap
+/******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -54,93 +44,65 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _utilTimelineGenerator = __webpack_require__(1);
+	var _viewCalView = __webpack_require__(1);
 	
-	var _utilTimelineGenerator2 = _interopRequireDefault(_utilTimelineGenerator);
+	var _viewCalView2 = _interopRequireDefault(_viewCalView);
 	
-	var _utilTimeAxisGenerator = __webpack_require__(2);
+	var now = performance.now();
+	var calView = new _viewCalView2['default']();
+	calView.render();
 	
-	var _utilTimeAxisGenerator2 = _interopRequireDefault(_utilTimeAxisGenerator);
+	// start div test
+	function getRandomInt(min, max) {
+	  return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
 	
-	var _utilEmployeesAxisGenerator = __webpack_require__(7);
+	var widthUnit = 100;
+	var heightUnit = 35;
 	
-	var _utilEmployeesAxisGenerator2 = _interopRequireDefault(_utilEmployeesAxisGenerator);
+	var div = document.createElement('div');
+	function RectangleDiv(container) {
+	  this.height = getRandomInt(1, 10) * heightUnit;
+	  this.width = widthUnit;
+	  this.left = getRandomInt(0, 40) * widthUnit;
+	  this.top = getRandomInt(0, 89) * heightUnit;
+	  var r = getRandomInt(0, 255);
+	  var g = getRandomInt(0, 255);
+	  var b = getRandomInt(0, 255);
+	  this.color = 'rgba(' + r + ',' + g + ',' + b + ',0.8)';
+	  this.el = div.cloneNode(false);
+	  this.el.className = 'cell';
+	  this.el.style.top = this.top + 'px';
+	  this.el.style.left = this.left + 'px';
+	  this.el.style.width = this.width + 'px';
+	  this.el.style.height = this.height + 'px';
+	  this.el.style.backgroundColor = this.color;
+	}
 	
-	var timeline = (0, _utilTimelineGenerator2['default'])(new Date(), 90, 'days');
-	var one = performance.now();
-	var timeAxis = (0, _utilTimeAxisGenerator2['default'])(timeline);
-	
-	var employees = new Array(100);
-	employees.fill('Someone');
-	var two = performance.now();
-	var emps = (0, _utilEmployeesAxisGenerator2['default'])(employees);
-	
-	var xAxis = document.getElementsByClassName('x-axis')[0];
-	var yAxis = document.getElementsByClassName('y-axis')[0];
-	
-	yAxis.appendChild(timeAxis);
-	xAxis.appendChild(emps);
-	
-	var cal = {
-	  greet: function greet() {
-	    return 'hello';
-	  }
+	RectangleDiv.prototype.createElement = function (tagName) {
+	  return document.createElement(tagName);
 	};
 	
-	exports['default'] = cal;
-	module.exports = exports['default'];
+	var count = 500;
+	var rects = [];
+	for (var x = 0; x < count; x++) {
+	  rects.push(new RectangleDiv());
+	}
+	
+	var fragment = document.createDocumentFragment();
+	rects.forEach(function (rect) {
+	  fragment.appendChild(rect.el);
+	});
+	var containerEl = document.getElementsByClassName('data')[0];
+	containerEl.appendChild(fragment);
+	// end div test
+	
+	console.log('wat', performance.now() - now);
 
 /***/ },
 /* 1 */
-/***/ function(module, exports) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	var dateMap = {
-	  days: 1,
-	  weeks: 7
-	};
-	
-	function isWeekend(date) {
-	  return date.getDay() == 6 || date.getDay() == 0;
-	}
-	
-	function cloneDate(date) {
-	  return new Date(date.getTime());
-	}
-	
-	exports['default'] = function (start, length) {
-	  var scale = arguments.length <= 2 || arguments[2] === undefined ? 'days' : arguments[2];
-	
-	  // The number of days that we add for the scale
-	  var diffUnit = dateMap[scale];
-	  var dates = [];
-	  var potentialDate, toAdd;
-	  for (var i = 0; i <= length; i++) {
-	    toAdd = i * diffUnit;
-	    potentialDate = cloneDate(start);
-	    // Update our date appropriately
-	    potentialDate.setDate(potentialDate.getDate() + toAdd);
-	    if (scale === 'days' && isWeekend(potentialDate)) {
-	      continue;
-	    }
-	    dates.push(potentialDate);
-	  }
-	  return dates;
-	};
-	
-	;
-	module.exports = exports['default'];
-
-/***/ },
-/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -149,32 +111,125 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _lodash = __webpack_require__(3);
+	var _lodash = __webpack_require__(2);
 	
 	var _lodash2 = _interopRequireDefault(_lodash);
 	
-	var _crel = __webpack_require__(5);
+	var _timeAxis = __webpack_require__(4);
 	
-	var _crel2 = _interopRequireDefault(_crel);
+	var _timeAxis2 = _interopRequireDefault(_timeAxis);
 	
-	var _dateFormatter = __webpack_require__(6);
+	var _employeeAxis = __webpack_require__(9);
 	
-	var _dateFormatter2 = _interopRequireDefault(_dateFormatter);
+	var _employeeAxis2 = _interopRequireDefault(_employeeAxis);
 	
-	exports['default'] = function (timeline) {
-	  var formattedDate;
-	  var children = _lodash2['default'].map(timeline, function (date) {
-	    formattedDate = (0, _dateFormatter2['default'])(date, 'word');
-	    return (0, _crel2['default'])('div', formattedDate);
-	  });
-	  return (0, _crel2['default'])('div', children);
-	};
+	var _dataContainerView = __webpack_require__(11);
 	
-	;
+	var _dataContainerView2 = _interopRequireDefault(_dataContainerView);
+	
+	// The CalView is the parent view of the entire calendar.
+	// The View itself mostly ensures that the axes and data container
+	// stay in sync as the user scrolls.
+	function CalView(options) {
+	  this._setEl();
+	  this.setupChildren();
+	}
+	
+	_lodash2['default'].extend(CalView.prototype, {
+	  _setEl: function _setEl() {
+	    this.el = document.getElementsByTagName('main')[0];
+	  },
+	
+	  setupChildren: function setupChildren() {
+	    this.timeAxisView = new _timeAxis2['default']();
+	    this.employeeAxisView = new _employeeAxis2['default']();
+	    this.dataContainerView = new _dataContainerView2['default']();
+	  },
+	
+	  // Renders our data for the first time. Should not be called
+	  // more than once; subsequent updates need to be intelligently
+	  // rendered with `update()`
+	  render: function render() {
+	    this.timeAxisView.render();
+	    this.employeeAxisView.render();
+	    this.registerScrollEvent();
+	    this.registerMousemoveEvent();
+	  },
+	
+	  // Update the DOM
+	  update: function update() {},
+	
+	  // Whether or not we're currently handling a data scroll
+	  _handlingDataScroll: false,
+	
+	  // This ensures that our axes stay lined up with the position
+	  // of the data container.
+	  registerScrollEvent: function registerScrollEvent() {
+	    var _this = this;
+	
+	    this.dataContainerView.el.addEventListener('scroll', function () {
+	      if (_this._handlingDataScroll) {
+	        return;
+	      }
+	      _this._handlingDataScroll = true;
+	      _this._onDataContainerScroll();
+	    });
+	  },
+	
+	  _onDataContainerScroll: function _onDataContainerScroll() {
+	    var _dataContainerView$el = this.dataContainerView.el;
+	    var scrollLeft = _dataContainerView$el.scrollLeft;
+	    var scrollTop = _dataContainerView$el.scrollTop;
+	
+	    this.timeAxisView.axisList.style.top = '-' + scrollTop + 'px';
+	    this.employeeAxisView.axisList.style.left = '-' + scrollLeft + 'px';
+	    this._handlingDataScroll = false;
+	  },
+	
+	  _handlingMousemove: false,
+	
+	  // This allows the user to scroll the data by mousewheeling on the axes
+	  registerMousemoveEvent: function registerMousemoveEvent() {
+	    this.timeAxisView.el.addEventListener('wheel', this._mousemoveHandler.bind(this));
+	    this.employeeAxisView.el.addEventListener('wheel', this._mousemoveHandler.bind(this));
+	  },
+	
+	  _mousemoveHandler: function _mousemoveHandler(e) {
+	    if (this._handlingMousemove) {
+	      return;
+	    }
+	    this._handlingMousemove = true;
+	    this._onMousemove(e);
+	  },
+	
+	  _onMousemove: function _onMousemove(e) {
+	    var currentTop = this.dataContainerView.el.scrollTop;
+	    var currentLeft = this.dataContainerView.el.scrollLeft;
+	
+	    // The wheel delta appears to be throttled by the native scrollbar;
+	    // this dampening term is based on tests on OSX in Chrome 46
+	    var changeY = e.wheelDeltaY / 2.4;
+	    var changeX = e.wheelDeltaX / 2.4;
+	
+	    var newTop = currentTop - changeY;
+	    var newLeft = currentLeft - changeX;
+	
+	    // Clamping may not be necessary. I need to test across browsers
+	    // var maxHeight = this.dataContainerView.data.height;
+	    // var maxWidth = this.dataContainerView.data.width;
+	    // newTop = clamp(newTop, 0, maxHeight);
+	    // newLeft = clamp(newLeft, 0, maxWidth);
+	    this.dataContainerView.el.scrollTop = newTop;
+	    this.dataContainerView.el.scrollLeft = newLeft;
+	    this._handlingMousemove = false;
+	  }
+	});
+	
+	exports['default'] = CalView;
 	module.exports = exports['default'];
 
 /***/ },
-/* 3 */
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/**
@@ -12529,10 +12584,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module), (function() { return this; }())))
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -12548,7 +12603,133 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _lodash = __webpack_require__(2);
+	
+	var _lodash2 = _interopRequireDefault(_lodash);
+	
+	var _utilTimelineGenerator = __webpack_require__(5);
+	
+	var _utilTimelineGenerator2 = _interopRequireDefault(_utilTimelineGenerator);
+	
+	var _utilTimeAxisGenerator = __webpack_require__(6);
+	
+	var _utilTimeAxisGenerator2 = _interopRequireDefault(_utilTimeAxisGenerator);
+	
+	function TimeAxisView() {
+	  var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	  this._setEl();
+	}
+	
+	_lodash2['default'].extend(TimeAxisView.prototype, {
+	  _setEl: function _setEl() {
+	    this.el = document.getElementsByClassName('y-axis')[0];
+	  },
+	
+	  render: function render() {
+	    var timeAxisData = (0, _utilTimelineGenerator2['default'])(new Date(), 90, 'days');
+	    var timeAxisList = (0, _utilTimeAxisGenerator2['default'])(timeAxisData);
+	    this.el.appendChild(timeAxisList);
+	    this.axisList = timeAxisList;
+	  }
+	});
+	
+	exports['default'] = TimeAxisView;
+	module.exports = exports['default'];
+
+/***/ },
 /* 5 */
+/***/ function(module, exports) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	var dateMap = {
+	  days: 1,
+	  weeks: 7
+	};
+	
+	function isWeekend(date) {
+	  return date.getDay() == 6 || date.getDay() == 0;
+	}
+	
+	function cloneDate(date) {
+	  return new Date(date.getTime());
+	}
+	
+	exports['default'] = function (start, length) {
+	  var scale = arguments.length <= 2 || arguments[2] === undefined ? 'days' : arguments[2];
+	
+	  // The number of days that we add for the scale
+	  var diffUnit = dateMap[scale];
+	  var dates = [];
+	  var potentialDate, toAdd;
+	  var i = 0;
+	  var index = 0;
+	  while (i < length) {
+	    toAdd = index * diffUnit;
+	    potentialDate = cloneDate(start);
+	    // Update our date appropriately
+	    potentialDate.setDate(potentialDate.getDate() + toAdd);
+	    var isDays = scale === 'days';
+	    var isAWeekend = isWeekend(potentialDate);
+	    if (!isDays || isDays && !isAWeekend) {
+	      dates.push(potentialDate);
+	      i++;
+	    }
+	    index++;
+	  }
+	  return dates;
+	};
+	
+	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _lodash = __webpack_require__(2);
+	
+	var _lodash2 = _interopRequireDefault(_lodash);
+	
+	var _crel = __webpack_require__(7);
+	
+	var _crel2 = _interopRequireDefault(_crel);
+	
+	var _dateFormatter = __webpack_require__(8);
+	
+	var _dateFormatter2 = _interopRequireDefault(_dateFormatter);
+	
+	exports['default'] = function (timeline) {
+	  var formattedDate;
+	  var children = _lodash2['default'].map(timeline, function (date) {
+	    formattedDate = (0, _dateFormatter2['default'])(date, 'word');
+	    return (0, _crel2['default'])('div', formattedDate);
+	  });
+	  return (0, _crel2['default'])('div', children);
+	};
+	
+	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//Copyright (C) 2012 Kory Nunn
@@ -12701,7 +12882,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 6 */
+/* 8 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -12736,7 +12917,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 7 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -12745,11 +12926,52 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _lodash = __webpack_require__(3);
+	var _lodash = __webpack_require__(2);
 	
 	var _lodash2 = _interopRequireDefault(_lodash);
 	
-	var _crel = __webpack_require__(5);
+	var _utilEmployeesAxisGenerator = __webpack_require__(10);
+	
+	var _utilEmployeesAxisGenerator2 = _interopRequireDefault(_utilEmployeesAxisGenerator);
+	
+	function EmployeeAxisView() {
+	  var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	  this._setEl();
+	}
+	
+	_lodash2['default'].extend(EmployeeAxisView.prototype, {
+	  _setEl: function _setEl() {
+	    this.el = document.getElementsByClassName('x-axis')[0];
+	  },
+	
+	  render: function render() {
+	    var employeeAxisData = new Array(40);
+	    employeeAxisData.fill('Someone');
+	    var employeeAxisList = (0, _utilEmployeesAxisGenerator2['default'])(employeeAxisData);
+	    this.el.appendChild(employeeAxisList);
+	    this.axisList = employeeAxisList;
+	  }
+	});
+	
+	exports['default'] = EmployeeAxisView;
+	module.exports = exports['default'];
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _lodash = __webpack_require__(2);
+	
+	var _lodash2 = _interopRequireDefault(_lodash);
+	
+	var _crel = __webpack_require__(7);
 	
 	var _crel2 = _interopRequireDefault(_crel);
 	
@@ -12763,8 +12985,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	;
 	module.exports = exports['default'];
 
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _lodash = __webpack_require__(2);
+	
+	var _lodash2 = _interopRequireDefault(_lodash);
+	
+	function DataContainerView() {
+	  var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	  this._setEl();
+	}
+	
+	_lodash2['default'].extend(DataContainerView.prototype, {
+	  _setEl: function _setEl() {
+	    this.el = document.getElementsByClassName('data-container')[0];
+	    this.data = document.getElementsByClassName('data')[0];
+	  }
+	});
+	
+	exports['default'] = DataContainerView;
+	module.exports = exports['default'];
+
 /***/ }
-/******/ ])
-});
-;
+/******/ ]);
 //# sourceMappingURL=cal.js.map

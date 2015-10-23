@@ -1,26 +1,52 @@
-import timelineGenerator from './util/timeline-generator';
-import timeAxisGenerator from './util/time-axis-generator';
+import CalView from './view/cal-view';
 
-var timeline = timelineGenerator(new Date(), 90, 'days');
-var one = performance.now();
-var timeAxis = timeAxisGenerator(timeline);
+var now = performance.now();
+var calView = new CalView();
+calView.render();
 
-import employeesAxisGenerator from './util/employees-axis-generator';
-var employees = new Array(100);
-employees.fill('Someone');
-var two = performance.now();
-var emps = employeesAxisGenerator(employees);
+// start div test
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-var xAxis = document.getElementsByClassName('x-axis')[0];
-var yAxis = document.getElementsByClassName('y-axis')[0];
+var widthUnit = 100;
+var heightUnit = 35;
 
-yAxis.appendChild(timeAxis);
-xAxis.appendChild(emps);
+var div = document.createElement('div');
+function RectangleDiv(container) {
+  this.height = getRandomInt(1, 10) * heightUnit;
+  this.width = widthUnit;
+  this.left = getRandomInt(0, 40) * widthUnit;
+  this.top = getRandomInt(0, 89) * heightUnit;
+  var r = getRandomInt(0, 255);
+  var g = getRandomInt(0, 255);
+  var b = getRandomInt(0, 255);
+  this.color = `rgba(${r},${g},${b},0.8)`;
+  this.el = div.cloneNode(false);
+  this.el.className = 'cell';
+  this.el.style.top = `${this.top}px`;
+  this.el.style.left = `${this.left}px`;
+  this.el.style.width = `${this.width}px`;
+  this.el.style.height = `${this.height}px`;
+  this.el.style.backgroundColor = this.color;
+}
 
-const cal = {
-  greet() {
-    return 'hello';
-  }
+RectangleDiv.prototype.createElement = function(tagName) {
+  return document.createElement(tagName);
 };
 
-export default cal;
+var count = 500;
+var rects = [];
+for (var x = 0; x < count; x++) {
+  rects.push(new RectangleDiv());
+}
+
+var fragment = document.createDocumentFragment();
+rects.forEach(rect => {
+  fragment.appendChild(rect.el);
+});
+var containerEl = document.getElementsByClassName('data')[0];
+containerEl.appendChild(fragment);
+// end div test
+
+console.log('wat', performance.now() - now);

@@ -54,10 +54,7 @@ main {
 }
 
 .x-axis {
-  position: absolute;
-  left: 110px;
-  top: 0;
-  width: calc(100% - 110px);
+  flex: 1;
   height: 25px;
   line-height: 25px;
   border-bottom: 1px solid #ddd;
@@ -70,7 +67,7 @@ main {
   top: 0;
   left: 0;
   height: 100%;
-  width: 10000px;
+  width: 4000px;
 }
 
 .x-axis > div > div {
@@ -91,6 +88,14 @@ main {
   text-align: center;
 }
 
+.y-axis > div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3150px;
+}
+
 .y-axis > div > div {
   font-size: 13px;
   height: 35px;
@@ -107,6 +112,11 @@ main {
 }
 
 .data-container > .data {
-  height: 4000px;
+  height: 3150px;
   width: 4000px;
+  position: relative;
+}
+
+.cell {
+  position: absolute;
 }
