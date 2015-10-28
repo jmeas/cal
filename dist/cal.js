@@ -66,8 +66,8 @@
 	function RectangleDiv(container) {
 	  this.height = getRandomInt(1, 10) * heightUnit;
 	  this.width = widthUnit;
-	  this.left = getRandomInt(0, 40) * widthUnit;
-	  this.top = getRandomInt(0, 89) * heightUnit;
+	  this.left = getRandomInt(0, 95) * widthUnit;
+	  this.top = getRandomInt(0, 249) * heightUnit;
 	  var r = getRandomInt(0, 255);
 	  var g = getRandomInt(0, 255);
 	  var b = getRandomInt(0, 255);
@@ -85,7 +85,7 @@
 	  return document.createElement(tagName);
 	};
 	
-	var count = 500;
+	var count = 5100;
 	var rects = [];
 	for (var x = 0; x < count; x++) {
 	  rects.push(new RectangleDiv());
@@ -99,7 +99,7 @@
 	containerEl.appendChild(fragment);
 	// end div test
 	
-	console.log('wat', performance.now() - now);
+	console.log('Rendered ' + count + ' in ' + (performance.now() - now) + ' ms');
 
 /***/ },
 /* 1 */
@@ -12636,7 +12636,7 @@
 	  },
 	
 	  render: function render() {
-	    var timeAxisData = (0, _utilTimelineGenerator2['default'])(new Date(), 90, 'days');
+	    var timeAxisData = (0, _utilTimelineGenerator2['default'])(new Date(), 260, 'days');
 	    var timeAxisList = (0, _utilTimeAxisGenerator2['default'])(timeAxisData);
 	    this.el.appendChild(timeAxisList);
 	    this.axisList = timeAxisList;
@@ -12946,7 +12946,7 @@
 	  },
 	
 	  render: function render() {
-	    var employeeAxisData = new Array(40);
+	    var employeeAxisData = new Array(96);
 	    employeeAxisData.fill('Someone');
 	    var employeeAxisList = (0, _utilEmployeesAxisGenerator2['default'])(employeeAxisData);
 	    this.el.appendChild(employeeAxisList);

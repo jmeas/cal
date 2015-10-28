@@ -11,7 +11,7 @@ _.extend(EmployeeAxisView.prototype, {
   },
 
   render() {
-    var employeeAxisData = new Array(40);
+    var employeeAxisData = new Array(96);
     employeeAxisData.fill('Someone');
     var employeeAxisList = employeesAxisGenerator(employeeAxisData);
     this.el.appendChild(employeeAxisList);

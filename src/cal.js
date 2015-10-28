@@ -16,8 +16,8 @@ var div = document.createElement('div');
 function RectangleDiv(container) {
   this.height = getRandomInt(1, 10) * heightUnit;
   this.width = widthUnit;
-  this.left = getRandomInt(0, 40) * widthUnit;
-  this.top = getRandomInt(0, 89) * heightUnit;
+  this.left = getRandomInt(0, 95) * widthUnit;
+  this.top = getRandomInt(0, 249) * heightUnit;
   var r = getRandomInt(0, 255);
   var g = getRandomInt(0, 255);
   var b = getRandomInt(0, 255);
@@ -35,7 +35,7 @@ RectangleDiv.prototype.createElement = function(tagName) {
   return document.createElement(tagName);
 };
 
-var count = 500;
+var count = 5100;
 var rects = [];
 for (var x = 0; x < count; x++) {
   rects.push(new RectangleDiv());
@@ -49,4 +49,4 @@ var containerEl = document.getElementsByClassName('data')[0];
 containerEl.appendChild(fragment);
 // end div test
 
-console.log('wat', performance.now() - now);
+console.log(`Rendered ${count} in ${performance.now() - now} ms`);

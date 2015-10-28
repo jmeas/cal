@@ -12,7 +12,7 @@ _.extend(TimeAxisView.prototype, {
   },
 
   render() {
-    var timeAxisData = timelineGenerator(new Date(), 90, 'days');
+    var timeAxisData = timelineGenerator(new Date(), 260, 'days');
     var timeAxisList = timeAxisGenerator(timeAxisData);
     this.el.appendChild(timeAxisList);
     this.axisList = timeAxisList;
