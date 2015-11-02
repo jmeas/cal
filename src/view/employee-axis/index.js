@@ -1,7 +1,9 @@
 import _ from 'lodash';
+import employeeGenerator from '../../util/employee-generator';
 import employeesAxisGenerator from '../../util/employees-axis-generator';
 
-function EmployeeAxisView(options = {}) {
+function EmployeeAxisView({employees}) {
+  this.employees = employees;
   this._setEl();
 }
 
@@ -11,9 +13,7 @@ _.extend(EmployeeAxisView.prototype, {
   },
 
   render() {
-    var employeeAxisData = new Array(96);
-    employeeAxisData.fill('Someone');
-    var employeeAxisList = employeesAxisGenerator(employeeAxisData);
+    var employeeAxisList = employeesAxisGenerator(this.employees);
     this.el.appendChild(employeeAxisList);
     this.axisList = employeeAxisList;
   }

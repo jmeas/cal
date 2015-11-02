@@ -3,12 +3,21 @@ import TimeAxisView from '../time-axis';
 import EmployeeAxisView from '../employee-axis';
 import DataContainerView from '../data-container-view';
 
+// Some cached dimensions. We could read these from the CSS, but
+// they're unlikely to change all that frequently, and
+// this is substantially simpler.
+const Y_AXIS_CELL_HEIGHT = 35;
+const X_AXIS_CELL_WIDTH = 100;
+
 // The CalView is the parent view of the entire calendar.
 // The View itself mostly ensures that the axes and data container
 // stay in sync as the user scrolls.
-function CalView(options) {
+function CalView({employees}) {
+  this.employees = employees;
+  this.dataContainerDimensions = {};
   this._setEl();
   this.setupChildren();
+  this.takeDataContainerMeasurement();
 }
 
 _.extend(CalView.prototype, {
@@ -17,9 +26,16 @@ _.extend(CalView.prototype, {
   },
 
   setupChildren() {
-    this.timeAxisView = new TimeAxisView();
-    this.employeeAxisView = new EmployeeAxisView();
-    this.dataContainerView = new DataContainerView();
+    this.timeAxisView = new TimeAxisView({
+      dataContainerDimensions: this.dataContainerDimensions,
+      yAxisCellHeight: Y_AXIS_CELL_HEIGHT
+    });
+    this.employeeAxisView = new EmployeeAxisView({
+      employees: this.employees
+    });
+    this.dataContainerView = new DataContainerView({
+      employees: this.employees
+    });
   },
 
   // Renders our data for the first time. Should not be called
@@ -28,12 +44,39 @@ _.extend(CalView.prototype, {
   render() {
     this.timeAxisView.render();
     this.employeeAxisView.render();
+    this.dataContainerView.render();
+    this.setScroll();
     this.registerScrollEvent();
     this.registerMousemoveEvent();
+    this.registerResizeEvent();
+  },
+
+  setScroll() {
+    this.dataContainerView.el.scrollTop = 130 * Y_AXIS_CELL_HEIGHT;
   },
 
   // Update the DOM
   update() {},
+
+  // The next few properties and methods are for managing the window resize event. We keep a cached
+  // version of the data container dimensions so that we can compute the rendered "chunks" of data.
+  _handlingResizeEvent: false,
+
+  registerResizeEvent() {
+    window.addEventListener('resize', () => {
+      if (this._handlingResizeEvent) { return; }
+      this._handlingResizeEvent = true;
+      requestAnimationFrame(() => {
+        this.takeDataContainerMeasurement();
+        this._handlingResizeEvent = false;
+      });
+    });
+  },
+
+  takeDataContainerMeasurement() {
+    this.dataContainerDimensions.height = this.dataContainerView.el.offsetHeight;
+    this.dataContainerDimensions.width = this.dataContainerView.el.offsetWidth;
+  },
 
   // Whether or not we're currently handling a data scroll
   _handlingDataScroll: false,
@@ -44,13 +87,16 @@ _.extend(CalView.prototype, {
     this.dataContainerView.el.addEventListener('scroll', () => {
       if (this._handlingDataScroll) { return; }
       this._handlingDataScroll = true;
-      this._onDataContainerScroll();
+      requestAnimationFrame(() => {
+        this._onDataContainerScroll();
+      });
     });
   },
 
   _onDataContainerScroll() {
     var {scrollLeft, scrollTop} = this.dataContainerView.el;
-    this.timeAxisView.axisList.style.top = `-${scrollTop}px`;
+    this.timeAxisView.update(scrollTop);
+    this.timeAxisView.axisChunk.node.style.top = `-${scrollTop}px`;
     this.employeeAxisView.axisList.style.left = `-${scrollLeft}px`;
     this._handlingDataScroll = false;
   },
@@ -66,7 +112,9 @@ _.extend(CalView.prototype, {
   _mousemoveHandler(e) {
     if (this._handlingMousemove) { return; }
     this._handlingMousemove = true;
-    this._onMousemove(e);
+    requestAnimationFrame(() => {
+      this._onMousemove(e);
+    });
   },
 
   _onMousemove(e) {

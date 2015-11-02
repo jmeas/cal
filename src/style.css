@@ -87,7 +87,7 @@ main {
 .y-axis {
   position: relative;
   width: 110px;
-  height: calc(100% - 25px);
+  height: 100%;
   border-right: 1px solid #ddd;
   overflow: hidden;
   text-align: center;
@@ -102,13 +102,15 @@ main {
 }
 
 .y-axis > div > div {
+  position: absolute;
   font-size: 13px;
   height: 35px;
+  width: 100%;
   line-height: 35px;
 }
 
 .data-container {
-  height: calc(100% - 25px);
+  height: 100%;
   width: calc(100% - 110px);
   overflow: scroll;
 }
@@ -120,5 +122,9 @@ main {
 }
 
 .cell {
+  box-sizing: border-box;
+  padding: 5px;
   position: absolute;
+  font-size: 12px;
 }
+
