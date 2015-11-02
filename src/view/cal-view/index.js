@@ -96,14 +96,14 @@ _.extend(CalView.prototype, {
   _onDataContainerScroll() {
     var {scrollLeft, scrollTop} = this.dataContainerView.el;
     this.timeAxisView.update(scrollTop);
-    this.timeAxisView.axisChunk.node.style.top = `-${scrollTop}px`;
+    this.timeAxisView.container.style.top = `-${scrollTop}px`;
     this.employeeAxisView.axisList.style.left = `-${scrollLeft}px`;
     this._handlingDataScroll = false;
   },
 
   _handlingMousemove: false,
 
-  // This allows the user to scroll the data by mousewheeling on the axes
+  // This allows the user to scroll the data by mousewheeling on the axes.
   registerMousemoveEvent() {
     this.timeAxisView.el.addEventListener('wheel', this._mousemoveHandler.bind(this));
     this.employeeAxisView.el.addEventListener('wheel', this._mousemoveHandler.bind(this));

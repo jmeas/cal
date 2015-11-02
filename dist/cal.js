@@ -72,7 +72,7 @@
 	var calView = new _viewCalView2['default']({ employees: employees });
 	calView.render();
 	
-	console.log('Rendered ' + count + ' in ' + (performance.now() - start) + ' ms');
+	console.log('Rendered in ' + (performance.now() - start) + ' ms');
 
 /***/ },
 /* 1 */
@@ -12580,14 +12580,14 @@
 	    var scrollTop = _dataContainerView$el.scrollTop;
 	
 	    this.timeAxisView.update(scrollTop);
-	    this.timeAxisView.axisChunk.node.style.top = '-' + scrollTop + 'px';
+	    this.timeAxisView.container.style.top = '-' + scrollTop + 'px';
 	    this.employeeAxisView.axisList.style.left = '-' + scrollLeft + 'px';
 	    this._handlingDataScroll = false;
 	  },
 	
 	  _handlingMousemove: false,
 	
-	  // This allows the user to scroll the data by mousewheeling on the axes
+	  // This allows the user to scroll the data by mousewheeling on the axes.
 	  registerMousemoveEvent: function registerMousemoveEvent() {
 	    this.timeAxisView.el.addEventListener('wheel', this._mousemoveHandler.bind(this));
 	    this.employeeAxisView.el.addEventListener('wheel', this._mousemoveHandler.bind(this));
@@ -12649,9 +12649,15 @@
 	
 	var _utilTimelineGenerator2 = _interopRequireDefault(_utilTimelineGenerator);
 	
-	var _utilTimeAxisManager = __webpack_require__(6);
+	// import timeAxisManager from '../../util/time-axis-manager';
 	
-	var _utilTimeAxisManager2 = _interopRequireDefault(_utilTimeAxisManager);
+	var _utilDateFormatter = __webpack_require__(6);
+	
+	var _utilDateFormatter2 = _interopRequireDefault(_utilDateFormatter);
+	
+	var _utilNodeManager = __webpack_require__(7);
+	
+	var _utilNodeManager2 = _interopRequireDefault(_utilNodeManager);
 	
 	var _utilQuantize = __webpack_require__(9);
 	
@@ -12661,86 +12667,125 @@
 	// to be considered 'small.' Small updates occur immediately; large
 	// updates are delayed 50ms to prevent large paints as the user scrolls
 	var SMALL_UPDATE_DELTA = 10;
+	
+	// How many items we render before and after the viewport to create
+	// the illusion of a smooth scroll
 	var PADDING = 10;
+	
+	// Determine if two dates are the same day
+	function isSameDay(dayOne, dayTwo) {
+	  if (!dayOne || !dayTwo) {
+	    return false;
+	  }
+	  dayOne = dayOne.getYear() + '-' + dayOne.getDay();
+	  dayTwo = dayTwo.getYear() + '-' + dayTwo.getDay();
+	  return dayOne === dayTwo;
+	}
 	
 	function TimeAxisView(_ref) {
 	  var dataContainerDimensions = _ref.dataContainerDimensions;
 	  var yAxisCellHeight = _ref.yAxisCellHeight;
+	  var _ref$date = _ref.date;
+	  var date = _ref$date === undefined ? new Date() : _ref$date;
 	
 	  this.yAxisCellHeight = yAxisCellHeight;
 	  this.dataContainerDimensions = dataContainerDimensions;
-	  this._setEl();
+	  this._setEls();
+	  this._createNodeManager();
+	  this.createAxisData(date);
 	}
 	
 	_lodash2['default'].extend(TimeAxisView.prototype, {
-	  _setEl: function _setEl() {
+	  _setEls: function _setEls() {
 	    this.el = document.getElementsByClassName('y-axis')[0];
+	    this.container = this.el.children[0];
 	  },
 	
-	  render: function render() {
-	    var timeAxisData = (0, _utilTimelineGenerator2['default'])({
-	      referenceDate: new Date(),
+	  _createNodeManager: function _createNodeManager() {
+	    this.nodeManager = new _utilNodeManager2['default']({
+	      dim: 'top',
+	      unit: this.yAxisCellHeight,
+	      initialPoolSize: 100,
+	      el: this.container,
+	      displayProp: 'time',
+	      formatFn: function formatFn(date) {
+	        return (0, _utilDateFormatter2['default'])(date, 'word');
+	      }
+	    });
+	  },
+	
+	  createAxisData: function createAxisData(date) {
+	    this.currentDate = date;
+	    this.timeAxisData = (0, _utilTimelineGenerator2['default'])({
+	      referenceDate: date,
 	      back: 180,
 	      forward: 180,
 	      scale: 'days'
 	    });
-	    var timeAxisChunk = _utilTimeAxisManager2['default'].generate(timeAxisData, {
-	      back: Math.floor(180 * 5 / 7),
-	      height: (0, _utilQuantize2['default'])(this.dataContainerDimensions.height, this.yAxisCellHeight),
-	      cellHeight: this.yAxisCellHeight,
-	      padding: PADDING
+	  },
+	
+	  render: function render() {
+	    var date = arguments.length <= 0 || arguments[0] === undefined ? new Date() : arguments[0];
+	
+	    if (!isSameDay(this.currentDate, date)) {
+	      this.createAxisData(date);
+	    }
+	
+	    var firstIndex = Math.floor(180 * 5 / 7);
+	    var heightIndex = (0, _utilQuantize2['default'])(this.dataContainerDimensions.height, this.yAxisCellHeight);
+	    var lastIndex = firstIndex + heightIndex;
+	
+	    this.nodeManager.update({
+	      list: this.timeAxisData,
+	      firstIndex: Math.floor(180 * 5 / 7) - PADDING,
+	      lastIndex: lastIndex + PADDING
 	    });
-	    this.el.appendChild(timeAxisChunk.node);
-	    this.axisChunk = timeAxisChunk;
 	  },
 	
 	  _deferredUpdate: undefined,
 	
 	  // Updates the view with a new top position
 	  update: function update(scrollTop) {
-	    var _this = this;
-	
 	    // Clear any existing update we might have in store
-	    clearTimeout(this._deferredUpdate);
-	    // Quantize and pad our values
-	    var quantizedScrollTop = (0, _utilQuantize2['default'])(scrollTop, this.yAxisCellHeight);
-	    var quantizedHeight = (0, _utilQuantize2['default'])(this.dataContainerDimensions.height, this.yAxisCellHeight);
-	    var topDiff = Math.abs(quantizedScrollTop - this.axisChunk.start - PADDING);
-	    var bottomDiff = Math.abs(quantizedScrollTop + quantizedHeight - this.axisChunk.end + PADDING);
-	    var delta = topDiff + bottomDiff;
+	    // clearTimeout(this._deferredUpdate);
+	    // // Quantize and pad our values
+	    // var quantizedScrollTop = quantize(scrollTop, this.yAxisCellHeight);
+	    // var quantizedHeight = quantize(this.dataContainerDimensions.height, this.yAxisCellHeight);
+	    // var topDiff = Math.abs(quantizedScrollTop - this.axisChunk.start - PADDING);
+	    // var calc = quantizedScrollTop + quantizedHeight - this.axisChunk.end + PADDING;
+	    // var bottomDiff = Math.abs(calc);
+	    // var delta = topDiff + bottomDiff;
 	
-	    if (delta < SMALL_UPDATE_DELTA) {
-	      this._update(quantizedScrollTop, quantizedHeight);
-	    } else {
-	      this._deferredUpdate = window.setTimeout(function () {
-	        _this._update(quantizedScrollTop, quantizedHeight);
-	      }, 50);
-	    }
+	    // if (delta < SMALL_UPDATE_DELTA) {
+	    //   this._update(quantizedScrollTop, quantizedHeight);
+	    // } else {
+	    //   this._deferredUpdate = window.setTimeout(() => {
+	    //     this._update(quantizedScrollTop, quantizedHeight);
+	    //   }, 50);
+	    // }
 	  },
 	
 	  _update: function _update(top, height) {
-	    var startPadding = Math.min(PADDING, top);
-	    var bottomPadding = Math.min(PADDING, 360 - top + height);
-	    var newStart = top - startPadding;
-	    var newEnd = top + height + bottomPadding;
-	    var oldStart = this.axisChunk.start;
-	    var oldEnd = this.axisChunk.end;
-	    var count = 0;
-	    _lodash2['default'].each(this.axisChunk.node.children, function (child, i) {
-	      // Sometimes `child` can be undefined (?)
-	      if (!child) {
-	        return;
-	      }
-	      // Update the index to be relative to the whole timeline
-	      i = oldStart + i;
-	      if (i < newStart || i > newEnd) {
-	        child.remove();
-	        _utilTimeAxisManager2['default'].pool.push(child);
-	        count++;
-	      }
-	    });
-	    this.axisChunk.start = newStart;
-	    this.axisChunk.end = newEnd;
+	    // var startPadding = Math.min(PADDING, top);
+	    // var bottomPadding = Math.min(PADDING, 360 - top + height);
+	    // var newStart = top - startPadding;
+	    // var newEnd = top + height + bottomPadding;
+	    // var oldStart = this.axisChunk.start;
+	    // var oldEnd = this.axisChunk.end;
+	    // var count = 0;
+	    // _.each(this.axisChunk.node.children, (child, i) => {
+	    //   // Sometimes `child` can be undefined (?)
+	    //   if (!child) { return; }
+	    //   // Update the index to be relative to the whole timeline
+	    //   i = oldStart + i;
+	    //   if (i < newStart || i > newEnd) {
+	    //     child.remove();
+	    //     timeAxisManager.pool.push(child);
+	    //     count++;
+	    //   }
+	    // });
+	    // this.axisChunk.start = newStart;
+	    // this.axisChunk.end = newEnd;
 	  }
 	});
 	
@@ -12793,7 +12838,7 @@
 	    var isDays = scale === 'days';
 	    var isAWeekend = isWeekend(potentialDate);
 	    if (!isDays || isDays && !isAWeekend) {
-	      dates.push(potentialDate);
+	      dates.push({ time: potentialDate });
 	      i++;
 	    }
 	    index++;
@@ -12806,66 +12851,6 @@
 
 /***/ },
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _lodash = __webpack_require__(1);
-	
-	var _lodash2 = _interopRequireDefault(_lodash);
-	
-	var _dateFormatter = __webpack_require__(7);
-	
-	var _dateFormatter2 = _interopRequireDefault(_dateFormatter);
-	
-	var _domPool = __webpack_require__(8);
-	
-	var _domPool2 = _interopRequireDefault(_domPool);
-	
-	var divPool = new _domPool2['default']({ tagName: 'div' });
-	divPool.allocate(100);
-	
-	exports['default'] = {
-	  pool: divPool,
-	
-	  generate: function generate(timeline, _ref) {
-	    var back = _ref.back;
-	    var height = _ref.height;
-	    var cellHeight = _ref.cellHeight;
-	    var padding = _ref.padding;
-	
-	    // This padding doesn't need to be truncated at the moment, as this is
-	    // only called for the first render.
-	    var start = back - padding;
-	    var end = start + height + 2 * padding;
-	
-	    // We never need to loop through every date, because we're only
-	    // ever dealing with a chunk of those dates.
-	    var totalSize = end - start;
-	    var formattedDate, el, date;
-	    var fragment = document.createDocumentFragment();
-	    _lodash2['default'].times(totalSize, function (n) {
-	      date = timeline[start + n];
-	      formattedDate = (0, _dateFormatter2['default'])(date, 'word');
-	      el = divPool.pop();
-	      el.textContent = formattedDate;
-	      el.style.top = (start + n) * cellHeight + 'px';
-	      fragment.appendChild(el);
-	    });
-	
-	    var node = divPool.pop();
-	    node.appendChild(fragment);
-	    return { start: start, end: end, node: node };
-	  }
-	};
-	module.exports = exports['default'];
-
-/***/ },
-/* 7 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -12897,6 +12882,172 @@
 	};
 	
 	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _lodash = __webpack_require__(1);
+	
+	var _lodash2 = _interopRequireDefault(_lodash);
+	
+	var _dateFormatter = __webpack_require__(6);
+	
+	var _dateFormatter2 = _interopRequireDefault(_dateFormatter);
+	
+	var _domPool = __webpack_require__(8);
+	
+	var _domPool2 = _interopRequireDefault(_domPool);
+	
+	// This thing creates our "chunks," which are a slice of a long list of nodes. It uses
+	// DOM pooling to prevent garbage collection while the user scrolls. Tl;dr: it's dope.
+	function NodeManager(_ref) {
+	  var initialPoolSize = _ref.initialPoolSize;
+	  var el = _ref.el;
+	  var displayProp = _ref.displayProp;
+	  var formatFn = _ref.formatFn;
+	  var unit = _ref.unit;
+	  var dim = _ref.dim;
+	
+	  this.initialPoolSize = initialPoolSize;
+	  this.el = el;
+	  this.displayProp = displayProp;
+	  this.formatFn = formatFn || _lodash2['default'].identity;
+	  this.dim = dim;
+	  this.unit = unit;
+	  this.createPool();
+	}
+	
+	_lodash2['default'].extend(NodeManager.prototype, {
+	  // These indices keep track of where we begin and end
+	  firstIndex: undefined,
+	  lastIndex: undefined,
+	
+	  createPool: function createPool(size) {
+	    this.pool = new _domPool2['default']({
+	      tagName: 'div'
+	    });
+	    this.pool.allocate(this.initialPoolSize);
+	  },
+	
+	  // Updating is a two-part process: removing nodes that have
+	  // moved too far away, and then adding new nodes that are moving
+	  // into view
+	  update: function update(_ref2) {
+	    var firstIndex = _ref2.firstIndex;
+	    var lastIndex = _ref2.lastIndex;
+	    var list = _ref2.list;
+	
+	    // Determine whether we're going forward or back. If we have
+	    // no children, we just assume that we're going forward.
+	    var directionSign;
+	    if (!this.el.children.length) {
+	      directionSign = 1;
+	    } else if (firstIndex < this.firstIndex) {
+	      var directionSign = -1;
+	    } else {
+	      directionSign = 1;
+	    }
+	
+	    var options = { firstIndex: firstIndex, lastIndex: lastIndex, directionSign: directionSign, list: list };
+	    this.removeNodes(options);
+	    this.addNodes(options);
+	    this.firstIndex = firstIndex;
+	    this.lastIndex = lastIndex;
+	  },
+	
+	  removeNodes: function removeNodes(_ref3) {
+	    var _this = this;
+	
+	    var firstIndex = _ref3.firstIndex;
+	    var lastIndex = _ref3.lastIndex;
+	    var directionSign = _ref3.directionSign;
+	    var list = _ref3.list;
+	
+	    // If we have no nodes, then there's nothing to remove!
+	    if (!this.el.children.length) {
+	      return;
+	    }
+	
+	    // Determine if we're removing from the front of back, based on the direction
+	    var target = directionSign ? firstIndex : lastIndex;
+	    var current = directionSign ? this.firstIndex : this.lastIndex;
+	
+	    var totalToRemove = Math.abs(current - target);
+	    var targetIndex, targetNode;
+	    _lodash2['default'].times(totalToRemove, function (n) {
+	      // We're either removing from the beginning or the end
+	      targetIndex = directionSign ? n : _this.el.children.length - 1 - n;
+	      targetNode = _this.el.children[targetIndex];
+	      // If the node exists, we remove it and add it back to the pool
+	      if (targetNode) {
+	        targetNode.remove();
+	        _this.pool.push(targetNode);
+	      }
+	    });
+	  },
+	
+	  addNodes: function addNodes(_ref4) {
+	    var _this2 = this;
+	
+	    var firstIndex = _ref4.firstIndex;
+	    var lastIndex = _ref4.lastIndex;
+	    var directionSign = _ref4.directionSign;
+	    var list = _ref4.list;
+	
+	    // Determine if we're adding to the front of back, based on the direction
+	    var target = directionSign ? lastIndex : firstIndex;
+	    var current = directionSign ? this.lastIndex : this.firstIndex;
+	
+	    var totalToAdd;
+	    // If we have no nodes, then we render the entire span of the indices
+	    if (!this.el.children.length) {
+	      totalToAdd = lastIndex - firstIndex;
+	    }
+	    // Otherwise, we only look at the difference between our current and target and index
+	    else {
+	        totalToAdd = Math.abs(current - target);
+	      }
+	
+	    var fragment = document.createDocumentFragment();
+	    var el, formattedText, val, absoluteIndex;
+	    _lodash2['default'].times(totalToAdd, function (n) {
+	      // When we're prepending the nodes, we need to add them in reverse order
+	      if (!directionSign) {
+	        n = toAdd - n;
+	        n--;
+	      } else {
+	        n++;
+	      }
+	
+	      absoluteIndex = target + n;
+	      // Get our value from the list, based on index,
+	      // then format it according to the format fn
+	      val = list[absoluteIndex][_this2.displayProp];
+	      formattedText = _this2.formatFn(val);
+	      el = _this2.pool.pop();
+	      el.textContent = formattedText;
+	      el.style[_this2.dim] = _this2.unit * absoluteIndex + 'px';
+	      fragment.appendChild(el);
+	    });
+	    // Although the order of the nodes doesn't matter, it's not much
+	    // work to keep them in order, so we do!
+	    if (directionSign) {
+	      this.el.appendChild(fragment);
+	    } else {
+	      this.el.insertBefore(fragment, this.el.firstChild);
+	    }
+	  }
+	});
+	
+	exports['default'] = NodeManager;
 	module.exports = exports['default'];
 
 /***/ },

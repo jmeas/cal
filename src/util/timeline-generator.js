@@ -31,7 +31,7 @@ export default function({ referenceDate, back, forward, scale = 'days' }) {
     var isDays = scale === 'days';
     var isAWeekend = isWeekend(potentialDate);
     if (!isDays || (isDays && !isAWeekend)) {
-      dates.push(potentialDate);
+      dates.push({time: potentialDate});
       i++;
     }
     index++;

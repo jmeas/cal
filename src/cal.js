@@ -16,4 +16,4 @@ var start = performance.now();
 var calView = new CalView({employees});
 calView.render();
 
-console.log(`Rendered ${count} in ${performance.now() - start} ms`);
+console.log(`Rendered in ${performance.now() - start} ms`);
