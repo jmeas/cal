@@ -2,17 +2,13 @@ import _ from 'lodash';
 import TimeAxisView from '../time-axis';
 import EmployeeAxisView from '../employee-axis';
 import DataContainerView from '../data-container-view';
-
-// Some cached dimensions. We could read these from the CSS, but
-// they're unlikely to change all that frequently, and
-// this is substantially simpler.
-const Y_AXIS_CELL_HEIGHT = 35;
-const X_AXIS_CELL_WIDTH = 100;
+import config from './config';
 
 // The CalView is the parent view of the entire calendar.
 // The View itself mostly ensures that the axes and data container
 // stay in sync as the user scrolls.
 function CalView({employees}) {
+  this.scale = config.defaultScale;
   this.employees = employees;
   this.dataContainerDimensions = {};
   this._setEl();
@@ -26,9 +22,14 @@ _.extend(CalView.prototype, {
   },
 
   setupChildren() {
+    var offsets = config.timelineOffsets[this.scale];
     this.timeAxisView = new TimeAxisView({
+      date: new Date(),
       dataContainerDimensions: this.dataContainerDimensions,
-      yAxisCellHeight: Y_AXIS_CELL_HEIGHT
+      yAxisCellHeight: config.yAxisCellHeight,
+      scale: this.scale,
+      back: offsets.back,
+      forward: offsets.forward
     });
     this.employeeAxisView = new EmployeeAxisView({
       employees: this.employees
@@ -52,7 +53,8 @@ _.extend(CalView.prototype, {
   },
 
   setScroll() {
-    this.dataContainerView.el.scrollTop = 130 * Y_AXIS_CELL_HEIGHT;
+    var offsetBack = config.timelineOffsets[this.scale].back;
+    this.dataContainerView.el.scrollTop = offsetBack * config.yAxisCellHeight;
   },
 
   // Update the DOM

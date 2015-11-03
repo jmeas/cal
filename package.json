@@ -67,6 +67,7 @@
     ]
   },
   "dependencies": {
+    "contained-periodic-values": "^1.0.0",
     "crel": "^2.1.8",
     "dom-pool": "^0.1.1",
     "jquery": "^2.1.4",

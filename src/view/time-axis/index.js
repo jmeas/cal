@@ -21,12 +21,11 @@ function isSameDay(dayOne, dayTwo) {
   return dayOne === dayTwo;
 }
 
-function TimeAxisView({dataContainerDimensions, yAxisCellHeight, date = new Date()}) {
-  this.yAxisCellHeight = yAxisCellHeight;
-  this.dataContainerDimensions = dataContainerDimensions;
+function TimeAxisView(options = {}) {
+  _.extend(this, options);
   this._setEls();
   this._createNodeManager();
-  this.createAxisData(date);
+  this.createAxisData(this.date);
 }
 
 _.extend(TimeAxisView.prototype, {
@@ -52,9 +51,9 @@ _.extend(TimeAxisView.prototype, {
     this.currentDate = date;
     this.timeAxisData = timelineGenerator({
       referenceDate: date,
-      back: 180,
-      forward: 180,
-      scale: 'days'
+      back: this.back,
+      forward: this.forward,
+      scale: this.scale
     });
   },
 
@@ -69,7 +68,7 @@ _.extend(TimeAxisView.prototype, {
 
     this.nodeManager.update({
       list: this.timeAxisData,
-      firstIndex: Math.floor(180 * 5 / 7) - PADDING,
+      firstIndex: firstIndex - PADDING,
       lastIndex: lastIndex + PADDING
     });
   },
