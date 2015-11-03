@@ -47,6 +47,10 @@ _.extend(CalView.prototype, {
     this.employeeAxisView.render();
     this.dataContainerView.render();
     this.setScroll();
+    // This causes an immediate scroll event because it's synchronous
+    // with the above `setScroll`. If I don't want that, I can setTimeout
+    // by 25ms, and then manually set the scroll. The axes are smart
+    // and won't re-render.
     this.registerScrollEvent();
     this.registerMousemoveEvent();
     this.registerResizeEvent();
@@ -89,18 +93,48 @@ _.extend(CalView.prototype, {
     this.dataContainerView.el.addEventListener('scroll', () => {
       if (this._handlingDataScroll) { return; }
       this._handlingDataScroll = true;
-      requestAnimationFrame(() => {
-        this._onDataContainerScroll();
+      requestAnimationFrame(timestamp => {
+        this._onDataContainerScroll(timestamp);
       });
     });
   },
 
-  _onDataContainerScroll() {
+  _lastTimestamp: null,
+  _lastPositionY: null,
+  _lastPositionX: null,
+  _clearScrollDataId: null,
+
+  _clearOldScrollData() {
+    console.log('CLEARING');
+    this._lastTimestamp = null;
+    this._lastPositionX = null;
+    this._lastPositionY = null;
+  },
+
+  _onDataContainerScroll(timestamp) {
+    clearTimeout(this._clearScrollDataId);
     var {scrollLeft, scrollTop} = this.dataContainerView.el;
+    var ySpeed, xSpeed, tDelta, yDelta, xDelta;
+    // console.log('woooo', timestamp, this._lastTimestamp);
+    if (this._lastTimestamp) {
+      yDelta = scrollTop - this._lastPositionY;
+      xDelta = scrollLeft - this._lastPositionX;
+      tDelta = timestamp - this._lastTimestamp;
+      ySpeed = Math.abs(yDelta / tDelta);
+      xSpeed = Math.abs(xDelta / tDelta);
+      console.log('ySpeed', ySpeed);
+    }
+
     this.timeAxisView.update(scrollTop);
     this.timeAxisView.container.style.top = `-${scrollTop}px`;
     this.employeeAxisView.axisList.style.left = `-${scrollLeft}px`;
     this._handlingDataScroll = false;
+
+    // Update our new positions and timestamp, then set it to expire in 30ms
+    this._lastPositionY = scrollTop;
+    this._lastPositionX = scrollLeft;
+    this._lastTimestamp = timestamp;
+    this._clearScrollDataId = setTimeout(this._clearOldScrollData.bind(this), 30);
   },
 
   _handlingMousemove: false,

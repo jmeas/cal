@@ -98,7 +98,7 @@ main {
   top: 0;
   left: 0;
   width: 100%;
-  height: 9100px;
+  height: 12600px;
 }
 
 .y-axis > div > div {
@@ -116,7 +116,7 @@ main {
 }
 
 .data-container > .data {
-  height: 9100px;
+  height: 12600px;
   width: 9600px;
   position: relative;
 }

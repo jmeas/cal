@@ -2,6 +2,7 @@ import containedPeriodicValues from 'contained-periodic-values';
 
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 
+// These are useful Date-related functions
 var dateUtil = {
   // Returns a clone of `date`
   cloneDate(date) {
@@ -83,7 +84,7 @@ var dateUtil = {
     return dateUtil.addDays(date, -days);
   },
 
-  // Subtract a `days` number of
+  // Subtract `days` from `date`
   subtractWeekDays(date, days) {
     return dateUtil.addWeekDays(date, -days);
   },

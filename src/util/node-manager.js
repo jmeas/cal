@@ -26,78 +26,106 @@ _.extend(NodeManager.prototype, {
     this.pool.allocate(this.initialPoolSize);
   },
 
-  // Updating is a two-part process: removing nodes that have
-  // moved too far away, and then adding new nodes that are moving
-  // into view
-  update({firstIndex, lastIndex, list}) {
-    // Determine whether we're going forward or back. If we have
-    // no children, we just assume that we're going forward.
-    var directionSign;
-    if (!this.el.children.length) {
-      directionSign = 1;
-    } else if (firstIndex < this.firstIndex) {
-      var directionSign = -1;
-    } else {
-      directionSign = 1;
+  // Ensure that the element is empty
+  clear() {
+    while (this.el.firstChild) {
+      this.el.removeChild(this.el.firstChild);
     }
+  },
 
-    var options = {firstIndex, lastIndex, directionSign, list};
-    this.removeNodes(options);
-    this.addNodes(options);
+  // Populates the axis with the initial batch of elements
+  initialRender({firstIndex, lastIndex, list}) {
+    if (this.el.children.length) {
+      this.clear();
+    }
+    var totalToAdd = lastIndex - firstIndex;
+    var fragment = document.createDocumentFragment();
+    var el, val, formattedText;
+    _.times(totalToAdd, n => {
+      absoluteIndex = firstIndex + n;
+
+      // Get our value from the list, based on index,
+      // then format it according to the format fn
+      val = list[absoluteIndex][this.displayProp];
+      formattedText = this.formatFn(val);
+
+      // Pop a node from the pool, then update its properties
+      el = this.pool.pop();
+      el.textContent = formattedText;
+      el.style[this.dim] = `${this.unit * absoluteIndex}px`;
+      fragment.appendChild(el);
+    });
+    this.el.appendChild(fragment);
     this.firstIndex = firstIndex;
     this.lastIndex = lastIndex;
   },
 
-  removeNodes({firstIndex, lastIndex, directionSign, list}) {
+  // Updating is a two-part process: removing nodes that have
+  // moved too far away, and then adding new nodes that are moving
+  // into view
+  update({firstIndex, lastIndex, list}) {
+    // Nothing to update if the indices are unchanged
+    if (firstIndex === this.firstIndex && lastIndex === this.lastIndex) {
+      return;
+    }
+    // Determine whether we're going forward or back. If we have
+    // no children, we just assume that we're going forward.
+    var directionSign;
+    directionSign = firstIndex < this.firstIndex ? -1 : 1;
+
+    var totalSize = lastIndex - firstIndex;
+    var delta = Math.abs(this.firstIndex - firstIndex);
+
+    // If the change is larger than the current size of the list, then we're
+    // effectively redrawing it
+    if (delta >= totalSize) {
+      this.initialRender({firstIndex, lastIndex, list});
+    }
+
+    // Otherwise, we do an intelligent update by adding and removing nodes
+    else {
+      var options = {firstIndex, lastIndex, directionSign, list, totalSize, delta};
+      this.removeNodes(options);
+      this.addNodes(options);
+      this.firstIndex = firstIndex;
+      this.lastIndex = lastIndex;
+    }
+  },
+
+  removeNodes({firstIndex, lastIndex, directionSign, list, totalSize, delta}) {
     // If we have no nodes, then there's nothing to remove!
     if (!this.el.children.length) { return; }
 
-    // Determine if we're removing from the front of back, based on the direction
-    var target = directionSign ? firstIndex : lastIndex;
-    var current = directionSign ? this.firstIndex : this.lastIndex;
-
-    var totalToRemove = Math.abs(current - target);
-    var targetIndex, targetNode;
-    _.times(totalToRemove, n => {
-      // We're either removing from the beginning or the end
-      targetIndex = directionSign ? n : this.el.children.length - 1 - n;
-      targetNode = this.el.children[targetIndex];
-      // If the node exists, we remove it and add it back to the pool
+    var targetNode, nodePosition;
+    var initialLength = this.el.children.length;
+    _.times(delta, () => {
+      // We either remove from the start or end of the list, depending
+      // on the direction of scrolling
+      nodePosition = directionSign > 0 ? 'firstChild' : 'lastChild';
+      targetNode = this.el[nodePosition];
+      // If the node exists, then we remove it and push back the element into the pool
       if (targetNode) {
-        targetNode.remove();
-        this.pool.push(targetNode);
+        this.pool.push(this.el.removeChild(targetNode));
       }
     });
   },
 
-  addNodes({firstIndex, lastIndex, directionSign, list}) {
-    // Determine if we're adding to the front of back, based on the direction
-    // It being positive when there's nothing does not help at all lol
-    var target = directionSign ? lastIndex : firstIndex;
-    var current = directionSign ? this.lastIndex : this.firstIndex;
-
-    var totalToAdd;
-    // If we have no nodes, then we render the entire span of the indices
-    if (!this.el.children.length) {
-      totalToAdd = lastIndex - firstIndex;
-    }
-    // Otherwise, we only look at the difference between our current and target and index
-    else {
-      totalToAdd = Math.abs(current - target);
-    }
+  addNodes({firstIndex, lastIndex, directionSign, list, totalSize, delta}) {
+    // Anchor ourselves based on the direction that we're moving toward
+    var anchor = directionSign > 0 ? this.lastIndex : this.firstIndex;
 
     var fragment = document.createDocumentFragment();
     var el, formattedText, val, absoluteIndex;
-    _.times(totalToAdd, n => {
+    _.times(delta, n => {
+      // Modify our number based on our direction
+      // n += directionSign;
+
       // When we're prepending the nodes, we need to add them in reverse order
-      if (!directionSign) {
-        n = toAdd - n;
-        n--;
-      } else {
-        n++;
+      if (directionSign < 0) {
+        n = delta - n;
       }
 
-      absoluteIndex = target + n;
+      absoluteIndex = anchor + (n * directionSign);
       // Get our value from the list, based on index,
       // then format it according to the format fn
       val = list[absoluteIndex][this.displayProp];
@@ -109,7 +137,7 @@ _.extend(NodeManager.prototype, {
     });
     // Although the order of the nodes doesn't matter, it's not much
     // work to keep them in order, so we do!
-    if (directionSign) {
+    if (directionSign > 0) {
       this.el.appendChild(fragment);
     } else {
       this.el.insertBefore(fragment, this.el.firstChild);

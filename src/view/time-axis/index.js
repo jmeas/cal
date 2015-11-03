@@ -8,7 +8,7 @@ import dateUtil from '../../util/date-util';
 // The total number of nodes that can be added/removed for an update
 // to be considered 'small.' Small updates occur immediately; large
 // updates are delayed 50ms to prevent large paints as the user scrolls
-const SMALL_UPDATE_DELTA = 10;
+const SMALL_UPDATE_DELTA = 12;
 
 // How many items we render before and after the viewport to create
 // the illusion of a smooth scroll
@@ -31,7 +31,8 @@ _.extend(TimeAxisView.prototype, {
     this.nodeManager = new NodeManager({
       dim: 'top',
       unit: this.yAxisCellHeight,
-      initialPoolSize: 100,
+      // A pool size of 80 will support every laptop for some time
+      initialPoolSize: 80,
       el: this.container,
       displayProp: 'time',
       formatFn(date) {
@@ -59,11 +60,17 @@ _.extend(TimeAxisView.prototype, {
     var heightIndex = quantize(this.dataContainerDimensions.height, this.yAxisCellHeight);
     var lastIndex = firstIndex + heightIndex;
 
-    this.nodeManager.update({
+    firstIndex -= PADDING;
+    lastIndex += PADDING;
+
+    this.nodeManager.initialRender({
       list: this.timeAxisData,
-      firstIndex: firstIndex - PADDING,
-      lastIndex: lastIndex + PADDING
+      firstIndex: firstIndex,
+      lastIndex: lastIndex
     });
+
+    this.firstIndex = firstIndex;
+    this.lastIndex = lastIndex;
   },
 
   _deferredUpdate: undefined,
@@ -71,45 +78,36 @@ _.extend(TimeAxisView.prototype, {
   // Updates the view with a new top position
   update(scrollTop) {
     // Clear any existing update we might have in store
-    // clearTimeout(this._deferredUpdate);
-    // // Quantize and pad our values
-    // var quantizedScrollTop = quantize(scrollTop, this.yAxisCellHeight);
-    // var quantizedHeight = quantize(this.dataContainerDimensions.height, this.yAxisCellHeight);
-    // var topDiff = Math.abs(quantizedScrollTop - this.axisChunk.start - PADDING);
-    // var calc = quantizedScrollTop + quantizedHeight - this.axisChunk.end + PADDING;
-    // var bottomDiff = Math.abs(calc);
-    // var delta = topDiff + bottomDiff;
+    clearTimeout(this._deferredUpdate);
+    // Quantize and pad our values
+    var quantizedScrollTop = quantize(scrollTop, this.yAxisCellHeight);
+    var quantizedHeight = quantize(this.dataContainerDimensions.height, this.yAxisCellHeight);
+    var topDiff = Math.abs(quantizedScrollTop - this.firstIndex - PADDING);
+    var calc = quantizedScrollTop + quantizedHeight - this.lastIndex + PADDING;
+    var bottomDiff = Math.abs(calc);
+    var delta = topDiff + bottomDiff;
 
-    // if (delta < SMALL_UPDATE_DELTA) {
-    //   this._update(quantizedScrollTop, quantizedHeight);
-    // } else {
-    //   this._deferredUpdate = window.setTimeout(() => {
-    //     this._update(quantizedScrollTop, quantizedHeight);
-    //   }, 50);
-    // }
+    if (delta < SMALL_UPDATE_DELTA) {
+      this._update(quantizedScrollTop, quantizedHeight);
+    } else {
+      this._deferredUpdate = window.setTimeout(() => {
+        this._update(quantizedScrollTop, quantizedHeight);
+      }, 50);
+    }
   },
 
   _update(top, height) {
-    // var startPadding = Math.min(PADDING, top);
-    // var bottomPadding = Math.min(PADDING, 360 - top + height);
-    // var newStart = top - startPadding;
-    // var newEnd = top + height + bottomPadding;
-    // var oldStart = this.axisChunk.start;
-    // var oldEnd = this.axisChunk.end;
-    // var count = 0;
-    // _.each(this.axisChunk.node.children, (child, i) => {
-    //   // Sometimes `child` can be undefined (?)
-    //   if (!child) { return; }
-    //   // Update the index to be relative to the whole timeline
-    //   i = oldStart + i;
-    //   if (i < newStart || i > newEnd) {
-    //     child.remove();
-    //     timeAxisManager.pool.push(child);
-    //     count++;
-    //   }
-    // });
-    // this.axisChunk.start = newStart;
-    // this.axisChunk.end = newEnd;
+    var startPadding = Math.min(PADDING, top);
+    var bottomPadding = Math.min(PADDING, this.timeAxisData.length - top - height);
+    var newStart = top - startPadding;
+    var newEnd = top + height + bottomPadding;
+    this.nodeManager.update({
+      list: this.timeAxisData,
+      firstIndex: newStart,
+      lastIndex: newEnd
+    });
+    this.firstIndex = newStart;
+    this.lastIndex = newEnd;
   }
 });
 
