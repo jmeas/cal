@@ -72,6 +72,7 @@ _.extend(NodeManager.prototype, {
 
   addNodes({firstIndex, lastIndex, directionSign, list}) {
     // Determine if we're adding to the front of back, based on the direction
+    // It being positive when there's nothing does not help at all lol
     var target = directionSign ? lastIndex : firstIndex;
     var current = directionSign ? this.lastIndex : this.firstIndex;
 

@@ -3,6 +3,7 @@ import timelineGenerator from '../../util/timeline-generator';
 import dateFormatter from '../../util/date-formatter';
 import NodeManager from '../../util/node-manager';
 import quantize from '../../util/quantize';
+import dateUtil from '../../util/date-util';
 
 // The total number of nodes that can be added/removed for an update
 // to be considered 'small.' Small updates occur immediately; large
@@ -12,14 +13,6 @@ const SMALL_UPDATE_DELTA = 10;
 // How many items we render before and after the viewport to create
 // the illusion of a smooth scroll
 const PADDING = 10;
-
-// Determine if two dates are the same day
-function isSameDay(dayOne, dayTwo) {
-  if (!dayOne || !dayTwo) { return false; }
-  dayOne = `${dayOne.getYear()}-${dayOne.getDay()}`;
-  dayTwo = `${dayTwo.getYear()}-${dayTwo.getDay()}`;
-  return dayOne === dayTwo;
-}
 
 function TimeAxisView(options = {}) {
   _.extend(this, options);
@@ -58,11 +51,11 @@ _.extend(TimeAxisView.prototype, {
   },
 
   render(date = new Date()) {
-    if (!isSameDay(this.currentDate, date)) {
+    if (!dateUtil.isSameDay(this.currentDate, date)) {
       this.createAxisData(date);
     }
 
-    var firstIndex = Math.floor(180 * 5 / 7);
+    var firstIndex = this.back;
     var heightIndex = quantize(this.dataContainerDimensions.height, this.yAxisCellHeight);
     var lastIndex = firstIndex + heightIndex;
 
