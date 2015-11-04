@@ -26,15 +26,23 @@ _.extend(CalView.prototype, {
     this.timeAxisView = new TimeAxisView({
       date: new Date(),
       dataContainerDimensions: this.dataContainerDimensions,
-      yAxisCellHeight: config.yAxisCellHeight,
+      unit: config.yAxisCellHeight,
       scale: this.scale,
       back: offsets.back,
-      forward: offsets.forward
+      forward: offsets.forward,
+      poolSize: 80,
+      displayProp: 'time',
+      dimension: 'top',
+      el: document.getElementsByClassName('y-axis')[0]
     });
     this.employeeAxisView = new EmployeeAxisView({
       employees: this.employees,
       dataContainerDimensions: this.dataContainerDimensions,
-      xAxisCellWidth: config.xAxisCellWidth
+      unit: config.xAxisCellWidth,
+      poolSize: 50,
+      displayProp: 'name',
+      dimension: 'left',
+      el: document.getElementsByClassName('x-axis')[0]
     });
     this.dataContainerView = new DataContainerView({
       employees: this.employees

@@ -11,25 +11,24 @@ const PADDING = 10;
 
 function TimeAxisView(options) {
   _.extend(this, options);
-  this._setEls();
+  this._setContainer();
   this._createNodeManager();
   this.createAxisData(this.date);
 }
 
 _.extend(TimeAxisView.prototype, {
-  _setEls() {
-    this.el = document.getElementsByClassName('y-axis')[0];
+  _setContainer() {
     this.container = this.el.children[0];
   },
 
   _createNodeManager() {
     this.nodeManager = new NodeManager({
-      dim: 'top',
-      unit: this.yAxisCellHeight,
+      dim: this.dimension,
+      unit: this.unit,
       // A pool size of 80 will support every laptop for some time
-      initialPoolSize: 80,
+      initialPoolSize: this.poolSize,
       el: this.container,
-      displayProp: 'time',
+      displayProp: this.displayProp,
       formatFn(date) {
         return dateFormatter(date, 'word');
       }
@@ -52,7 +51,7 @@ _.extend(TimeAxisView.prototype, {
     }
 
     var firstIndex = this.back;
-    var heightIndex = quantize(this.dataContainerDimensions.height, this.yAxisCellHeight);
+    var heightIndex = quantize(this.dataContainerDimensions.height, this.unit);
     var lastIndex = firstIndex + heightIndex;
 
     var startPadding = Math.min(PADDING, firstIndex);
@@ -78,8 +77,8 @@ _.extend(TimeAxisView.prototype, {
     // Clear any existing update we might have in store
     clearTimeout(this._deferredUpdate);
     // Quantize and pad our values
-    var quantizedScrollTop = quantize(scrollTop, this.yAxisCellHeight);
-    var quantizedHeight = quantize(this.dataContainerDimensions.height, this.yAxisCellHeight);
+    var quantizedScrollTop = quantize(scrollTop, this.unit);
+    var quantizedHeight = quantize(this.dataContainerDimensions.height, this.unit);
 
     if (!ySpeed || ySpeed < 4) {
       this._update(quantizedScrollTop, quantizedHeight);

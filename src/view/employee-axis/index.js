@@ -7,29 +7,28 @@ const PADDING = 7;
 
 function EmployeeAxisView(options) {
   _.extend(this, options);
-  this._setEls();
+  this._setContainer();
   this._createNodeManager();
 }
 
 _.extend(EmployeeAxisView.prototype, {
-  _setEls() {
-    this.el = document.getElementsByClassName('x-axis')[0];
+  _setContainer() {
     this.container = this.el.children[0];
   },
 
   _createNodeManager() {
     this.nodeManager = new NodeManager({
-      dim: 'left',
-      unit: this.xAxisCellWidth,
-      initialPoolSize: 50,
+      dim: this.dimension,
+      unit: this.unit,
+      initialPoolSize: this.poolSize,
       el: this.container,
-      displayProp: 'name'
+      displayProp: this.displayProp
     });
   },
 
   render() {
     var firstIndex = 0;
-    var widthIndex = quantize(this.dataContainerDimensions.width, this.xAxisCellWidth);
+    var widthIndex = quantize(this.dataContainerDimensions.width, this.unit);
     var lastIndex = firstIndex + widthIndex;
 
     var startPadding = Math.min(PADDING, firstIndex);
@@ -55,8 +54,8 @@ _.extend(EmployeeAxisView.prototype, {
     // Clear any existing update we might have in store
     clearTimeout(this._deferredUpdate);
     // Quantize and pad our values
-    var quantizedScrollLeft = quantize(scrollLeft, this.xAxisCellWidth);
-    var quantizedWidth = quantize(this.dataContainerDimensions.width, this.xAxisCellWidth);
+    var quantizedScrollLeft = quantize(scrollLeft, this.unit);
+    var quantizedWidth = quantize(this.dataContainerDimensions.width, this.unit);
 
     if (!ySpeed || ySpeed < 4) {
       this._update(quantizedScrollLeft, quantizedWidth);
