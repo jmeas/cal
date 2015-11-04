@@ -74,31 +74,34 @@ _.extend(NodeManager.prototype, {
     directionSign = firstIndex < this.firstIndex ? -1 : 1;
 
     var totalSize = lastIndex - firstIndex;
-    var delta = Math.abs(this.firstIndex - firstIndex);
+    var backwardDelta = Math.abs(this.firstIndex - firstIndex);
+    var forwardDelta = Math.abs(this.lastIndex - lastIndex);
+
+    var removeDelta = directionSign > 0 ? backwardDelta : forwardDelta;
+    var addDelta = directionSign > 0 ? forwardDelta : backwardDelta;
 
     // If the change is larger than the current size of the list, then we're
     // effectively redrawing it
-    if (delta >= totalSize) {
+    if (backwardDelta >= totalSize) {
       this.initialRender({firstIndex, lastIndex, list});
     }
 
     // Otherwise, we do an intelligent update by adding and removing nodes
     else {
-      var options = {firstIndex, lastIndex, directionSign, list, totalSize, delta};
-      this.removeNodes(options);
-      this.addNodes(options);
+      this.removeNodes({directionSign, removeDelta});
+      this.addNodes({directionSign, list, totalSize, addDelta});
       this.firstIndex = firstIndex;
       this.lastIndex = lastIndex;
     }
   },
 
-  removeNodes({firstIndex, lastIndex, directionSign, list, totalSize, delta}) {
+  removeNodes({directionSign, removeDelta}) {
     // If we have no nodes, then there's nothing to remove!
     if (!this.el.children.length) { return; }
 
     var targetNode, nodePosition;
     var initialLength = this.el.children.length;
-    _.times(delta, () => {
+    _.times(removeDelta, () => {
       // We either remove from the start or end of the list, depending
       // on the direction of scrolling
       nodePosition = directionSign > 0 ? 'firstChild' : 'lastChild';
@@ -110,22 +113,20 @@ _.extend(NodeManager.prototype, {
     });
   },
 
-  addNodes({firstIndex, lastIndex, directionSign, list, totalSize, delta}) {
+  addNodes({directionSign, list, totalSize, addDelta}) {
     // Anchor ourselves based on the direction that we're moving toward
     var anchor = directionSign > 0 ? this.lastIndex : this.firstIndex;
 
     var fragment = document.createDocumentFragment();
     var el, formattedText, val, absoluteIndex;
-    _.times(delta, n => {
-      // Modify our number based on our direction
-      // n += directionSign;
-
+    _.times(addDelta, n => {
       // When we're prepending the nodes, we need to add them in reverse order
       if (directionSign < 0) {
-        n = delta - n;
+        n = addDelta - n;
       }
 
       absoluteIndex = anchor + (n * directionSign);
+
       // Get our value from the list, based on index,
       // then format it according to the format fn
       val = list[absoluteIndex][this.displayProp];
