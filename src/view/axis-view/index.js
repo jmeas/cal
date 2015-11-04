@@ -1,15 +1,14 @@
 import _ from 'lodash';
-import employeeGenerator from '../../util/employee-generator';
 import NodeManager from '../../util/node-manager';
 import quantize from '../../util/quantize';
 
-function EmployeeAxisView(options) {
+function AxisView(options) {
   _.extend(this, options);
   this._setContainer();
   this._createNodeManager();
 }
 
-_.extend(EmployeeAxisView.prototype, {
+_.extend(AxisView.prototype, {
   _setContainer() {
     this.container = this.el.children[0];
   },
@@ -20,13 +19,14 @@ _.extend(EmployeeAxisView.prototype, {
       unit: this.unit,
       initialPoolSize: this.poolSize,
       el: this.container,
-      displayProp: this.displayProp
+      displayProp: this.displayProp,
+      formatFn: this.formatFn
     });
   },
 
   render() {
-    var firstIndex = 0;
-    var widthIndex = quantize(this.dataContainerDimensions.width, this.unit);
+    var firstIndex = this.initialIndex;
+    var widthIndex = quantize(this.dataContainerDimensions[this.containerDim], this.unit);
     var lastIndex = firstIndex + widthIndex;
 
     var startPadding = Math.min(this.padding, firstIndex);
@@ -48,14 +48,14 @@ _.extend(EmployeeAxisView.prototype, {
   _deferredUpdate: undefined,
 
   // Updates the view with a new top position
-  update({scrollLeft, xSpeed, ySpeed}) {
+  update({scrollOffset, speed}) {
     // Clear any existing update we might have in store
     clearTimeout(this._deferredUpdate);
     // Quantize and pad our values
-    var quantizedScrollLeft = quantize(scrollLeft, this.unit);
-    var quantizedWidth = quantize(this.dataContainerDimensions.width, this.unit);
+    var quantizedScrollLeft = quantize(scrollOffset, this.unit);
+    var quantizedWidth = quantize(this.dataContainerDimensions[this.containerDim], this.unit);
 
-    if (!ySpeed || ySpeed < 4) {
+    if (!speed || speed < 4) {
       this._update(quantizedScrollLeft, quantizedWidth);
     } else {
       this._deferredUpdate = window.setTimeout(() => {
@@ -79,4 +79,4 @@ _.extend(EmployeeAxisView.prototype, {
   }
 });
 
-export default EmployeeAxisView;
+export default AxisView;

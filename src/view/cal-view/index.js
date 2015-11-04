@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import config from './config';
-import TimeAxisView from '../time-axis';
-import EmployeeAxisView from '../employee-axis';
+import AxisView from '../axis-view';
 import DataContainerView from '../data-container-view';
 import timelineGenerator from '../../util/timeline-generator';
+import dateFormatter from '../../util/date-formatter';
 
 // The CalView is the parent view of the entire calendar.
 // The View itself mostly ensures that the axes and data container
@@ -36,27 +36,31 @@ _.extend(CalView.prototype, {
 
   setupChildren() {
     var offsets = config.timelineOffsets[this.scale];
-    this.timeAxisView = new TimeAxisView({
+    this.timeAxisView = new AxisView({
       list: this.timeline,
       dataContainerDimensions: this.dataContainerDimensions,
       unit: config.yAxisCellHeight,
-      scale: this.scale,
-      back: offsets.back,
-      forward: offsets.forward,
       poolSize: 80,
       padding: 10,
+      initialIndex: offsets.back,
       displayProp: 'time',
       dimension: 'top',
+      containerDim: 'height',
+      formatFn(date) {
+        return dateFormatter(date, 'word');
+      },
       el: document.getElementsByClassName('y-axis')[0]
     });
-    this.employeeAxisView = new EmployeeAxisView({
+    this.employeeAxisView = new AxisView({
       list: this.employees,
       dataContainerDimensions: this.dataContainerDimensions,
       unit: config.xAxisCellWidth,
       poolSize: 50,
       padding: 7,
+      initialIndex: 0,
       displayProp: 'name',
       dimension: 'left',
+      containerDim: 'width',
       el: document.getElementsByClassName('x-axis')[0]
     });
     this.dataContainerView = new DataContainerView({
@@ -148,8 +152,14 @@ _.extend(CalView.prototype, {
       xSpeed = Math.abs(xDelta / tDelta);
     }
 
-    this.timeAxisView.update({scrollTop, ySpeed, xSpeed});
-    this.employeeAxisView.update({scrollLeft, ySpeed, xSpeed});
+    this.timeAxisView.update({
+      scrollOffset: scrollTop,
+      speed: ySpeed
+    });
+    this.employeeAxisView.update({
+      scrollOffset: scrollLeft,
+      speed: xSpeed
+    });
     this.timeAxisView.container.style.top = `-${scrollTop}px`;
     this.employeeAxisView.container.style.left = `-${scrollLeft}px`;
     this._handlingDataScroll = false;
