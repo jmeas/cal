@@ -1,16 +1,19 @@
 import _ from 'lodash';
+import config from './config';
 import TimeAxisView from '../time-axis';
 import EmployeeAxisView from '../employee-axis';
 import DataContainerView from '../data-container-view';
-import config from './config';
+import timelineGenerator from '../../util/timeline-generator';
 
 // The CalView is the parent view of the entire calendar.
 // The View itself mostly ensures that the axes and data container
 // stay in sync as the user scrolls.
-function CalView({employees}) {
+function CalView({employees, date}) {
   this.scale = config.defaultScale;
   this.employees = employees;
+  this.date = date;
   this.dataContainerDimensions = {};
+  this.createTimeline(this.date);
   this._setEl();
   this.setupChildren();
   this.takeDataContainerMeasurement();
@@ -21,25 +24,37 @@ _.extend(CalView.prototype, {
     this.el = document.getElementsByTagName('main')[0];
   },
 
+  createTimeline(date) {
+    var offsets = config.timelineOffsets[this.scale];
+    this.timeline = timelineGenerator({
+      referenceDate: date,
+      back: offsets.back,
+      forward: offsets.forward,
+      scale: this.scale
+    });
+  },
+
   setupChildren() {
     var offsets = config.timelineOffsets[this.scale];
     this.timeAxisView = new TimeAxisView({
-      date: new Date(),
+      list: this.timeline,
       dataContainerDimensions: this.dataContainerDimensions,
       unit: config.yAxisCellHeight,
       scale: this.scale,
       back: offsets.back,
       forward: offsets.forward,
       poolSize: 80,
+      padding: 10,
       displayProp: 'time',
       dimension: 'top',
       el: document.getElementsByClassName('y-axis')[0]
     });
     this.employeeAxisView = new EmployeeAxisView({
-      employees: this.employees,
+      list: this.employees,
       dataContainerDimensions: this.dataContainerDimensions,
       unit: config.xAxisCellWidth,
       poolSize: 50,
+      padding: 7,
       displayProp: 'name',
       dimension: 'left',
       el: document.getElementsByClassName('x-axis')[0]

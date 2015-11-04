@@ -5,15 +5,10 @@ import NodeManager from '../../util/node-manager';
 import quantize from '../../util/quantize';
 import dateUtil from '../../util/date-util';
 
-// How many items we render before and after the viewport to create
-// the illusion of a smooth scroll
-const PADDING = 10;
-
 function TimeAxisView(options) {
   _.extend(this, options);
   this._setContainer();
   this._createNodeManager();
-  this.createAxisData(this.date);
 }
 
 _.extend(TimeAxisView.prototype, {
@@ -35,33 +30,19 @@ _.extend(TimeAxisView.prototype, {
     });
   },
 
-  createAxisData(date) {
-    this.currentDate = date;
-    this.timeAxisData = timelineGenerator({
-      referenceDate: date,
-      back: this.back,
-      forward: this.forward,
-      scale: this.scale
-    });
-  },
-
-  render(date = new Date()) {
-    if (!dateUtil.isSameDay(this.currentDate, date)) {
-      this.createAxisData(date);
-    }
-
+  render() {
     var firstIndex = this.back;
     var heightIndex = quantize(this.dataContainerDimensions.height, this.unit);
     var lastIndex = firstIndex + heightIndex;
 
-    var startPadding = Math.min(PADDING, firstIndex);
-    var bottomPadding = Math.min(PADDING, this.timeAxisData.length - lastIndex);
+    var startPadding = Math.min(this.padding, firstIndex);
+    var bottomPadding = Math.min(this.padding, this.list.length - lastIndex);
 
     firstIndex -= startPadding;
     lastIndex += bottomPadding;
 
     this.nodeManager.initialRender({
-      list: this.timeAxisData,
+      list: this.list,
       firstIndex: firstIndex,
       lastIndex: lastIndex
     });
@@ -90,12 +71,12 @@ _.extend(TimeAxisView.prototype, {
   },
 
   _update(top, height) {
-    var startPadding = Math.min(PADDING, top);
-    var bottomPadding = Math.min(PADDING, this.timeAxisData.length - top - height);
+    var startPadding = Math.min(this.padding, top);
+    var bottomPadding = Math.min(this.padding, this.list.length - top - height);
     var newStart = top - startPadding;
     var newEnd = top + height + bottomPadding;
     this.nodeManager.update({
-      list: this.timeAxisData,
+      list: this.list,
       firstIndex: newStart,
       lastIndex: newEnd
     });

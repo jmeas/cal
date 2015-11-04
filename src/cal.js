@@ -13,7 +13,8 @@ employees = _.sortBy(employees, 'name');
 // Let's keep track of how performant we're being
 var start = performance.now();
 
-var calView = new CalView({employees});
+var date = new Date();
+var calView = new CalView({employees, date});
 calView.render();
 
 console.log(`Rendered in ${performance.now() - start} ms`);

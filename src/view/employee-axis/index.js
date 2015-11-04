@@ -3,8 +3,6 @@ import employeeGenerator from '../../util/employee-generator';
 import NodeManager from '../../util/node-manager';
 import quantize from '../../util/quantize';
 
-const PADDING = 7;
-
 function EmployeeAxisView(options) {
   _.extend(this, options);
   this._setContainer();
@@ -31,14 +29,14 @@ _.extend(EmployeeAxisView.prototype, {
     var widthIndex = quantize(this.dataContainerDimensions.width, this.unit);
     var lastIndex = firstIndex + widthIndex;
 
-    var startPadding = Math.min(PADDING, firstIndex);
-    var bottomPadding = Math.min(PADDING, this.employees.length - lastIndex);
+    var startPadding = Math.min(this.padding, firstIndex);
+    var bottomPadding = Math.min(this.padding, this.list.length - lastIndex);
 
     firstIndex -= startPadding;
     lastIndex += bottomPadding;
 
     this.nodeManager.initialRender({
-      list: this.employees,
+      list: this.list,
       firstIndex: firstIndex,
       lastIndex: lastIndex
     });
@@ -67,12 +65,12 @@ _.extend(EmployeeAxisView.prototype, {
   },
 
   _update(left, width) {
-    var startPadding = Math.min(PADDING, left);
-    var bottomPadding = Math.min(PADDING, this.employees.length - left - width);
+    var startPadding = Math.min(this.padding, left);
+    var bottomPadding = Math.min(this.padding, this.list.length - left - width);
     var newStart = left - startPadding;
     var newEnd = left + width + bottomPadding;
     this.nodeManager.update({
-      list: this.employees,
+      list: this.list,
       firstIndex: newStart,
       lastIndex: newEnd
     });
