@@ -105,7 +105,6 @@ _.extend(CalView.prototype, {
   _clearScrollDataId: null,
 
   _clearOldScrollData() {
-    console.log('CLEARING');
     this._lastTimestamp = null;
     this._lastPositionX = null;
     this._lastPositionY = null;
@@ -122,10 +121,9 @@ _.extend(CalView.prototype, {
       tDelta = timestamp - this._lastTimestamp;
       ySpeed = Math.abs(yDelta / tDelta);
       xSpeed = Math.abs(xDelta / tDelta);
-      console.log('ySpeed', ySpeed);
     }
 
-    this.timeAxisView.update(scrollTop);
+    this.timeAxisView.update({scrollTop, ySpeed, xSpeed});
     this.timeAxisView.container.style.top = `-${scrollTop}px`;
     this.employeeAxisView.axisList.style.left = `-${scrollLeft}px`;
     this._handlingDataScroll = false;

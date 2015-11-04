@@ -5,11 +5,6 @@ import NodeManager from '../../util/node-manager';
 import quantize from '../../util/quantize';
 import dateUtil from '../../util/date-util';
 
-// The total number of nodes that can be added/removed for an update
-// to be considered 'small.' Small updates occur immediately; large
-// updates are delayed 50ms to prevent large paints as the user scrolls
-const SMALL_UPDATE_DELTA = 12;
-
 // How many items we render before and after the viewport to create
 // the illusion of a smooth scroll
 const PADDING = 10;
@@ -76,7 +71,7 @@ _.extend(TimeAxisView.prototype, {
   _deferredUpdate: undefined,
 
   // Updates the view with a new top position
-  update(scrollTop) {
+  update({scrollTop, xSpeed, ySpeed}) {
     // Clear any existing update we might have in store
     clearTimeout(this._deferredUpdate);
     // Quantize and pad our values
@@ -85,9 +80,8 @@ _.extend(TimeAxisView.prototype, {
     var topDiff = Math.abs(quantizedScrollTop - this.firstIndex - PADDING);
     var calc = quantizedScrollTop + quantizedHeight - this.lastIndex + PADDING;
     var bottomDiff = Math.abs(calc);
-    var delta = topDiff + bottomDiff;
 
-    if (delta < SMALL_UPDATE_DELTA) {
+    if (!ySpeed || ySpeed < 4) {
       this._update(quantizedScrollTop, quantizedHeight);
     } else {
       this._deferredUpdate = window.setTimeout(() => {
