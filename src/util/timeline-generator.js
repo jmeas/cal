@@ -6,7 +6,8 @@ const dateMap = {
 };
 
 export default function({ referenceDate, back, forward, scale = 'days' }) {
-  var length = back + forward;
+  // The "1" here accounts for the referenceDate itself.
+  var length = back + forward + 1;
   // The number of days that we add for the scale
   var diffUnit = dateMap[scale];
   var dates = [];
