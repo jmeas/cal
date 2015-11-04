@@ -55,7 +55,7 @@ _.extend(AxisView.prototype, {
     var quantizedScrollLeft = quantize(scrollOffset, this.unit);
     var quantizedWidth = quantize(this.dataContainerDimensions[this.containerDim], this.unit);
 
-    if (!speed || speed < 4) {
+    if (!speed || speed < 6) {
       this._update(quantizedScrollLeft, quantizedWidth);
     } else {
       this._deferredUpdate = window.setTimeout(() => {

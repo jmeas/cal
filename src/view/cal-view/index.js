@@ -41,7 +41,7 @@ _.extend(CalView.prototype, {
       dataContainerDimensions: this.dataContainerDimensions,
       unit: config.yAxisCellHeight,
       poolSize: 80,
-      padding: 10,
+      padding: 15,
       initialIndex: offsets.back,
       displayProp: 'time',
       dimension: 'top',

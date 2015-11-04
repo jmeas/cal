@@ -5,9 +5,9 @@ import employeeGenerator from './mock/employee-generator';
 // How many employees we're testing out
 var employeeCount = 96;
 // This is how many total utilizations we render
-var count = 96 * 100;
+var utilizationCount = 0;
 
-var employees = employeeGenerator(employeeCount);
+var employees = employeeGenerator({employeeCount, utilizationCount});
 employees = _.sortBy(employees, 'name');
 
 // Let's keep track of how performant we're being
@@ -17,4 +17,6 @@ var date = new Date();
 var calView = new CalView({employees, date});
 calView.render();
 
-console.log(`Rendered in ${performance.now() - start} ms`);
+var time = performance.now() - start;
+var msg = `${utilizationCount} utilizations for ${employeeCount} employees rendered in ${time} ms`;
+console.log(msg);

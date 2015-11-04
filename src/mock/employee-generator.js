@@ -29,16 +29,13 @@ function utilizationGenerator() {
 }
 
 // Return a list of utilizations
-function utilizationsGenerator() {
-  // Each employee has this many utilizations
-  var size = 0;
-
-  if (size === 0) {
+function utilizationsGenerator(count) {
+  if (count === 0) {
     return [];
   }
 
   var utilizations = [];
-  for (var i = 0; i <= size; i++) {
+  for (var i = 0; i <= count; i++) {
     utilizations.push(utilizationGenerator());
   }
   return utilizations;
@@ -49,15 +46,15 @@ function getRandomName() {
   return names[index];
 }
 
-function employeeGenerator(length = 0) {
+function employeeGenerator({employeeCount = 0, utilizationCount = 0}) {
   var employees = [];
   var name;
-  for (var i = 0; i < length; i++) {
+  for (var i = 0; i < employeeCount; i++) {
     name = getRandomName();
     employees.push({
       name: name,
       charCode: name.charCodeAt(0),
-      utilizations: utilizationsGenerator()
+      utilizations: utilizationsGenerator(utilizationCount)
     });
   }
   return employees;
