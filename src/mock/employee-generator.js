@@ -1,9 +1,5 @@
+import _ from 'lodash';
 import names from './names';
-
-// Generate a random integer
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
 // Width and height values
 var widthUnit = 100;
@@ -11,14 +7,14 @@ var heightUnit = 35;
 
 // Return a single utilization
 function utilizationGenerator() {
-  var leftIndex = getRandomInt(0, 95);
-  var topIndex = getRandomInt(0, 249);
-  var r = getRandomInt(0, 255);
-  var g = getRandomInt(0, 255);
-  var b = getRandomInt(0, 255);
+  var leftIndex = _.random(0, 95);
+  var topIndex = _.random(0, 249);
+  var r = _.random(0, 255);
+  var g = _.random(0, 255);
+  var b = _.random(0, 255);
   return {
     name: 'Project X',
-    height: getRandomInt(1, 10) * heightUnit,
+    height: _.random(1, 10) * heightUnit,
     width: widthUnit,
     leftIndex: leftIndex,
     topIndex: topIndex,
@@ -28,35 +24,17 @@ function utilizationGenerator() {
   };
 }
 
-// Return a list of utilizations
-function utilizationsGenerator(count) {
-  if (count === 0) {
-    return [];
-  }
-
-  var utilizations = [];
-  for (var i = 0; i <= count; i++) {
-    utilizations.push(utilizationGenerator());
-  }
-  return utilizations;
-}
-
-function getRandomName() {
-  var index = getRandomInt(0, names.length - 1);
-  return names[index];
-}
-
 function employeeGenerator({employeeCount = 0, utilizationCount = 0}) {
   var employees = [];
   var name;
-  for (var i = 0; i < employeeCount; i++) {
-    name = getRandomName();
+  _.times(employeeCount, () => {
+    name = _.sample(names);
     employees.push({
       name: name,
       charCode: name.charCodeAt(0),
-      utilizations: utilizationsGenerator(utilizationCount)
+      utilizations: _.times(utilizationCount, utilizationGenerator)
     });
-  }
+  });
   return employees;
 }
 
