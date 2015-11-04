@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import CalView from './view/cal-view';
-import employeeGenerator from './util/employee-generator';
+import employeeGenerator from './mock/employee-generator';
 
 // How many employees we're testing out
 var employeeCount = 96;
