@@ -9,7 +9,7 @@ import dateUtil from '../../util/date-util';
 // the illusion of a smooth scroll
 const PADDING = 10;
 
-function TimeAxisView(options = {}) {
+function TimeAxisView(options) {
   _.extend(this, options);
   this._setEls();
   this._createNodeManager();
@@ -80,9 +80,6 @@ _.extend(TimeAxisView.prototype, {
     // Quantize and pad our values
     var quantizedScrollTop = quantize(scrollTop, this.yAxisCellHeight);
     var quantizedHeight = quantize(this.dataContainerDimensions.height, this.yAxisCellHeight);
-    var topDiff = Math.abs(quantizedScrollTop - this.firstIndex - PADDING);
-    var calc = quantizedScrollTop + quantizedHeight - this.lastIndex + PADDING;
-    var bottomDiff = Math.abs(calc);
 
     if (!ySpeed || ySpeed < 4) {
       this._update(quantizedScrollTop, quantizedHeight);

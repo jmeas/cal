@@ -78,6 +78,7 @@ main {
 }
 
 .x-axis > div > div {
+  position: absolute;
   height: 25px;
   line-height: 25px;
   width: 100px;

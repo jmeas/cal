@@ -32,7 +32,9 @@ _.extend(CalView.prototype, {
       forward: offsets.forward
     });
     this.employeeAxisView = new EmployeeAxisView({
-      employees: this.employees
+      employees: this.employees,
+      dataContainerDimensions: this.dataContainerDimensions,
+      xAxisCellWidth: config.xAxisCellWidth
     });
     this.dataContainerView = new DataContainerView({
       employees: this.employees
@@ -124,8 +126,9 @@ _.extend(CalView.prototype, {
     }
 
     this.timeAxisView.update({scrollTop, ySpeed, xSpeed});
+    this.employeeAxisView.update({scrollLeft, ySpeed, xSpeed});
     this.timeAxisView.container.style.top = `-${scrollTop}px`;
-    this.employeeAxisView.axisList.style.left = `-${scrollLeft}px`;
+    this.employeeAxisView.container.style.left = `-${scrollLeft}px`;
     this._handlingDataScroll = false;
 
     // Update our new positions and timestamp, then set it to expire in 30ms
