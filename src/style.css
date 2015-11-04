@@ -74,14 +74,14 @@ main {
   top: 0;
   left: 0;
   height: 100%;
-  width: 9600px;
+  width: 13440px;
 }
 
 .x-axis > div > div {
   position: absolute;
   height: 25px;
   line-height: 25px;
-  width: 100px;
+  width: 140px;
   text-align: center;
 }
 
@@ -118,7 +118,7 @@ main {
 
 .data-container > .data {
   height: 12635px;
-  width: 9600px;
+  width: 13440px;
   position: relative;
 }
 

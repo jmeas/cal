@@ -19,5 +19,5 @@ export default {
   // they're unlikely to change all that frequently, and
   // this is substantially simpler.
   yAxisCellHeight: 35,
-  xAxisCellWidth: 100,
+  xAxisCellWidth: 140,
 };

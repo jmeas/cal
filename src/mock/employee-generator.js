@@ -2,7 +2,7 @@ import _ from 'lodash';
 import names from './names';
 
 // Width and height values
-var widthUnit = 100;
+var widthUnit = 140;
 var heightUnit = 35;
 
 // Return a single utilization
