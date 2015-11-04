@@ -21,7 +21,6 @@ export default function({ referenceDate, back, forward, scale = 'days' }) {
   var method = scale === 'days' ? 'subtractWeekDays' : 'subtractDays';
   var amount = diffUnit * back;
   start = dateUtil[method](start, amount);
-  // start.setDate(referenceDate.getDate() - diffUnit * back);
   while (i < length) {
     toAdd = index * diffUnit;
     potentialDate = dateUtil.cloneDate(start);
