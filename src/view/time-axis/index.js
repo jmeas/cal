@@ -55,8 +55,11 @@ _.extend(TimeAxisView.prototype, {
     var heightIndex = quantize(this.dataContainerDimensions.height, this.yAxisCellHeight);
     var lastIndex = firstIndex + heightIndex;
 
-    firstIndex -= PADDING;
-    lastIndex += PADDING;
+    var startPadding = Math.min(PADDING, firstIndex);
+    var bottomPadding = Math.min(PADDING, this.timeAxisData.length - lastIndex);
+
+    firstIndex -= startPadding;
+    lastIndex += bottomPadding;
 
     this.nodeManager.initialRender({
       list: this.timeAxisData,
