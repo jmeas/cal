@@ -24,7 +24,10 @@ _.extend(AxisView.prototype, {
     });
   },
 
-  render() {
+  render(list) {
+    if (list) {
+      this.list = list;
+    }
     var firstIndex = this.initialIndex;
     var widthIndex = quantize(this.dataContainerDimensions[this.containerDim], this.unit);
     var lastIndex = firstIndex + widthIndex;
@@ -32,8 +35,10 @@ _.extend(AxisView.prototype, {
     var startPadding = Math.min(this.padding, firstIndex);
     var bottomPadding = Math.min(this.padding, this.list.length - lastIndex);
 
-    firstIndex -= startPadding;
-    lastIndex += bottomPadding;
+    var padding = Math.min(startPadding, bottomPadding);
+
+    firstIndex -= padding;
+    lastIndex += padding;
 
     this.nodeManager.initialRender({
       list: this.list,
@@ -67,8 +72,9 @@ _.extend(AxisView.prototype, {
   _update(left, width) {
     var startPadding = Math.min(this.padding, left);
     var bottomPadding = Math.min(this.padding, this.list.length - left - width);
-    var newStart = left - startPadding;
-    var newEnd = left + width + bottomPadding;
+    var padding = Math.min(startPadding, bottomPadding);
+    var newStart = left - padding;
+    var newEnd = left + width + padding;
     this.nodeManager.update({
       list: this.list,
       firstIndex: newStart,

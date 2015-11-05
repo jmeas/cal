@@ -71,7 +71,11 @@ _.extend(NodeManager.prototype, {
     // Determine whether we're going forward or back. If we have
     // no children, we just assume that we're going forward.
     var directionSign;
-    directionSign = firstIndex < this.firstIndex ? -1 : 1;
+    if (this.firstIndex !== 0) {
+      directionSign = firstIndex < this.firstIndex ? -1 : 1;
+    } else {
+      directionSign = lastIndex < this.lastIndex ? -1 : 1;
+    }
 
     var totalSize = lastIndex - firstIndex;
     var backwardDelta = Math.abs(this.firstIndex - firstIndex);
