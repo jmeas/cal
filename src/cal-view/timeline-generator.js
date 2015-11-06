@@ -1,4 +1,4 @@
-import dateUtil from './date-util';
+import dateUtil from '../common/date-util';
 
 const dateMap = {
   days: 1,

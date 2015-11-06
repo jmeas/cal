@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import quantize from '../../util/quantize';
-import NodeManager from '../../util/node-manager';
+import quantize from './quantize';
+import NodeManager from './node-manager';
 
 function AxisView(options) {
   _.extend(this, options);

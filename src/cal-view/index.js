@@ -2,8 +2,8 @@ import _ from 'lodash';
 import config from './config';
 import AxisView from '../axis-view';
 import DataContainerView from '../data-container-view';
-import timelineGenerator from '../../util/timeline-generator';
-import dateUtil from '../../util/date-util';
+import timelineGenerator from './timeline-generator';
+import dateUtil from '../common/date-util';
 
 // The CalView is the parent view of the entire calendar.
 // The View itself mostly ensures that the axes and data container

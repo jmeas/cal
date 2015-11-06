@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import CalView from './view/cal-view';
+import CalView from './cal-view';
 import employeeGenerator from './mock/employee-generator';
 
 // How many employees we're testing out
