@@ -29,7 +29,7 @@ _.extend(NodeManager.prototype, {
   // Ensure that the element is empty
   clear() {
     while (this.el.firstChild) {
-      this.el.removeChild(this.el.firstChild);
+      this.pool.push(this.el.removeChild(this.el.firstChild));
     }
   },
 
