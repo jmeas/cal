@@ -25,6 +25,8 @@ const formatMethods = {
 
 // These are useful Date-related functions
 var dateUtil = {
+  millisecondsPerDay: MILLISECONDS_PER_DAY,
+
   // Returns a clone of `date`
   cloneDate(date) {
     return new Date(date.getTime());
