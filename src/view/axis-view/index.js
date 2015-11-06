@@ -77,8 +77,8 @@ _.extend(AxisView.prototype, {
   // render a brand new chunk, rather than doing a smart update.
   _update(offset, length, clean) {
     var {firstIndex, lastIndex} = this._getIndices(offset, length);
-    var method = clean ? 'initialRender' : 'update';
-    this.nodeManager[method]({
+    // var method = clean ? 'initialRender' : 'update';
+    this.nodeManager.update({
       list: this.list,
       firstIndex,
       lastIndex

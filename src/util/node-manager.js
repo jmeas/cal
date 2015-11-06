@@ -68,6 +68,11 @@ _.extend(NodeManager.prototype, {
     if (firstIndex === this.firstIndex && lastIndex === this.lastIndex) {
       return;
     }
+    // If this manager has no indices, then it must be the first render.
+    else if (_.isUndefined(this.firstIndex) || _.isUndefined(this.lastIndex)) {
+      return this.initialRender({firstIndex, lastIndex, list});
+    }
+
     // Determine whether we're going forward or back. If we have
     // no children, we just assume that we're going forward.
     var directionSign;
