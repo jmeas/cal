@@ -3,7 +3,7 @@ import config from './config';
 import AxisView from '../axis-view';
 import DataContainerView from '../data-container-view';
 import timelineGenerator from '../../util/timeline-generator';
-import dateFormatter from '../../util/date-formatter';
+import dateUtil from '../../util/date-util';
 
 // The CalView is the parent view of the entire calendar.
 // The View itself mostly ensures that the axes and data container
@@ -47,7 +47,7 @@ _.extend(CalView.prototype, {
       dimension: 'top',
       containerDim: 'height',
       formatFn(date) {
-        return dateFormatter(date, 'word');
+        return dateUtil.format(date, 'word');
       },
       el: document.getElementsByClassName('y-axis')[0]
     });

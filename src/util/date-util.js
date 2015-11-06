@@ -2,6 +2,27 @@ import containedPeriodicValues from 'contained-periodic-values';
 
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 
+const monthNames = [
+  'January', 'February', 'March',
+  'April', 'May', 'June', 'July',
+  'August', 'September', 'October',
+  'November', 'December'
+];
+
+// These are used by `dateUtil.format()`
+const formatMethods = {
+  // 2015-10-11
+  iso(dd, mm, y) {
+    return `${y}-${mm + 1}-${dd}`;
+  },
+
+  // Oct 22, 2015
+  word(dd, mm, y) {
+    var month = monthNames[mm].slice(0, 3);
+    return `${month} ${dd}, ${y}`;
+  }
+};
+
 // These are useful Date-related functions
 var dateUtil = {
   // Returns a clone of `date`
@@ -105,6 +126,17 @@ var dateUtil = {
     dateOne = `${dateOne.getYear()}-${dateOne.getDay()}`;
     dateTwo = `${dateTwo.getYear()}-${dateTwo.getDay()}`;
     return dateOne === dateTwo;
+  },
+
+  // Return a string representation of a date. The
+  // supported styles are:
+  // `iso`: 2015-10-11
+  // `word`: Oct 11, 2015
+  format(date, style) {
+    var dd = date.getDate();
+    var mm = date.getMonth();
+    var y = date.getFullYear();
+    return formatMethods[style](dd, mm, y);
   }
 };
 

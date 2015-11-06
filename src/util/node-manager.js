@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import dateFormatter from './date-formatter';
 import DomPool from 'dom-pool';
 
 // This thing creates our "chunks," which are a slice of a long list of nodes. It uses
