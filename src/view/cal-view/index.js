@@ -143,7 +143,6 @@ _.extend(CalView.prototype, {
     clearTimeout(this._clearScrollDataId);
     var {scrollLeft, scrollTop} = this.dataContainerView.el;
     var ySpeed, xSpeed, tDelta, yDelta, xDelta;
-    // console.log('woooo', timestamp, this._lastTimestamp);
     if (this._lastTimestamp) {
       yDelta = scrollTop - this._lastPositionY;
       xDelta = scrollLeft - this._lastPositionX;
