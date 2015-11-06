@@ -10,32 +10,14 @@ function NodeListManager({initialPoolSize, el, displayProp, formatFn, unit, dim}
   this.formatFn = formatFn || _.identity;
   this.dim = dim;
   this.unit = unit;
-  this.createPool();
+  this._createPool();
 }
 
 _.extend(NodeListManager.prototype, {
-  // These indices keep track of where we begin and end
-  firstIndex: undefined,
-  lastIndex: undefined,
-
-  createPool(size) {
-    this.pool = new DomPool({
-      tagName: 'div'
-    });
-    this.pool.allocate(this.initialPoolSize);
-  },
-
-  // Ensure that the element is empty
-  clear() {
-    while (this.el.firstChild) {
-      this.pool.push(this.el.removeChild(this.el.firstChild));
-    }
-  },
-
   // Populates the axis with the initial batch of elements
   initialRender({firstIndex, lastIndex, list}) {
     if (this.el.children.length) {
-      this.clear();
+      this._clear();
     }
     var totalToAdd = lastIndex - firstIndex;
     var fragment = document.createDocumentFragment();
@@ -55,8 +37,8 @@ _.extend(NodeListManager.prototype, {
       fragment.appendChild(el);
     });
     this.el.appendChild(fragment);
-    this.firstIndex = firstIndex;
-    this.lastIndex = lastIndex;
+    this._firstIndex = firstIndex;
+    this._lastIndex = lastIndex;
   },
 
   // Updating is a two-part process: removing nodes that have
@@ -64,26 +46,26 @@ _.extend(NodeListManager.prototype, {
   // into view
   update({firstIndex, lastIndex, list}) {
     // Nothing to update if the indices are unchanged
-    if (firstIndex === this.firstIndex && lastIndex === this.lastIndex) {
+    if (firstIndex === this._firstIndex && lastIndex === this._lastIndex) {
       return;
     }
     // If this manager has no indices, then it must be the first render.
-    else if (_.isUndefined(this.firstIndex) || _.isUndefined(this.lastIndex)) {
+    else if (_.isUndefined(this._firstIndex) || _.isUndefined(this._lastIndex)) {
       return this.initialRender({firstIndex, lastIndex, list});
     }
 
     // Determine whether we're going forward or back. If we have
     // no children, we just assume that we're going forward.
     var directionSign;
-    if (this.firstIndex !== 0) {
-      directionSign = firstIndex < this.firstIndex ? -1 : 1;
+    if (this._firstIndex !== 0) {
+      directionSign = firstIndex < this._firstIndex ? -1 : 1;
     } else {
-      directionSign = lastIndex < this.lastIndex ? -1 : 1;
+      directionSign = lastIndex < this._lastIndex ? -1 : 1;
     }
 
     var totalSize = lastIndex - firstIndex;
-    var backwardDelta = Math.abs(this.firstIndex - firstIndex);
-    var forwardDelta = Math.abs(this.lastIndex - lastIndex);
+    var backwardDelta = Math.abs(this._firstIndex - firstIndex);
+    var forwardDelta = Math.abs(this._lastIndex - lastIndex);
 
     var removeDelta = directionSign > 0 ? backwardDelta : forwardDelta;
     var addDelta = directionSign > 0 ? forwardDelta : backwardDelta;
@@ -96,14 +78,32 @@ _.extend(NodeListManager.prototype, {
 
     // Otherwise, we do an intelligent update by adding and removing nodes
     else {
-      this.removeNodes({directionSign, removeDelta});
-      this.addNodes({directionSign, list, totalSize, addDelta});
-      this.firstIndex = firstIndex;
-      this.lastIndex = lastIndex;
+      this._removeNodes({directionSign, removeDelta});
+      this._addNodes({directionSign, list, totalSize, addDelta});
+      this._firstIndex = firstIndex;
+      this._lastIndex = lastIndex;
     }
   },
 
-  removeNodes({directionSign, removeDelta}) {
+  // These indices keep track of where we begin and end
+  _firstIndex: undefined,
+  _lastIndex: undefined,
+
+  _createPool(size) {
+    this.pool = new DomPool({
+      tagName: 'div'
+    });
+    this.pool.allocate(this.initialPoolSize);
+  },
+
+  // Ensure that the element is empty
+  _clear() {
+    while (this.el.firstChild) {
+      this.pool.push(this.el.removeChild(this.el.firstChild));
+    }
+  },
+
+  _removeNodes({directionSign, removeDelta}) {
     // If we have no nodes, then there's nothing to remove!
     if (!this.el.children.length) { return; }
 
@@ -121,9 +121,9 @@ _.extend(NodeListManager.prototype, {
     });
   },
 
-  addNodes({directionSign, list, totalSize, addDelta}) {
+  _addNodes({directionSign, list, totalSize, addDelta}) {
     // Anchor ourselves based on the direction that we're moving toward
-    var anchor = directionSign > 0 ? this.lastIndex : this.firstIndex;
+    var anchor = directionSign > 0 ? this._lastIndex : this._firstIndex;
 
     var fragment = document.createDocumentFragment();
     var el, formattedText, val, absoluteIndex;
