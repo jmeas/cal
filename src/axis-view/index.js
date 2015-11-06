@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import quantize from './quantize';
+import quantize from '../common/quantize';
 import NodeListManager from './node-list-manager';
 
 function AxisView(options) {
