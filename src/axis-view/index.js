@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import quantize from './quantize';
-import NodeManager from './node-manager';
+import NodeListManager from './node-list-manager';
 
 function AxisView(options) {
   _.extend(this, options);
   this._setContainer();
-  this._createNodeManager();
+  this._createNodeListManager();
 }
 
 _.extend(AxisView.prototype, {
@@ -50,9 +50,9 @@ _.extend(AxisView.prototype, {
     this.container = this.el.children[0];
   },
 
-  // The NodeManager manages the smart updating of our list.
-  _createNodeManager() {
-    this.nodeManager = new NodeManager({
+  // The NodeListManager manages the smart updating of our list.
+  _createNodeListManager() {
+    this.nodeListManager = new NodeListManager({
       unit: this.unit,
       el: this.container,
       dim: this.dimension,
@@ -73,12 +73,12 @@ _.extend(AxisView.prototype, {
     return {firstIndex, lastIndex};
   },
 
-  // Tell the NodeManager to update the list. Pass `clean` as `true` to
+  // Tell the NodeListManager to update the list. Pass `clean` as `true` to
   // render a brand new chunk, rather than doing a smart update.
   _update(offset, length, clean) {
     var {firstIndex, lastIndex} = this._getIndices(offset, length);
     // var method = clean ? 'initialRender' : 'update';
-    this.nodeManager.update({
+    this.nodeListManager.update({
       list: this.list,
       firstIndex,
       lastIndex

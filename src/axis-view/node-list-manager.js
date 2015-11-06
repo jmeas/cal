@@ -3,7 +3,7 @@ import DomPool from 'dom-pool';
 
 // This thing creates our "chunks," which are a slice of a long list of nodes. It uses
 // DOM pooling to prevent garbage collection while the user scrolls. Tl;dr: it's dope.
-function NodeManager({initialPoolSize, el, displayProp, formatFn, unit, dim}) {
+function NodeListManager({initialPoolSize, el, displayProp, formatFn, unit, dim}) {
   this.initialPoolSize = initialPoolSize;
   this.el = el;
   this.displayProp = displayProp;
@@ -13,7 +13,7 @@ function NodeManager({initialPoolSize, el, displayProp, formatFn, unit, dim}) {
   this.createPool();
 }
 
-_.extend(NodeManager.prototype, {
+_.extend(NodeListManager.prototype, {
   // These indices keep track of where we begin and end
   firstIndex: undefined,
   lastIndex: undefined,
@@ -154,4 +154,4 @@ _.extend(NodeManager.prototype, {
   }
 });
 
-export default NodeManager;
+export default NodeListManager;
