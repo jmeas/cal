@@ -11,10 +11,7 @@ function AxisView(options) {
 _.extend(AxisView.prototype, {
   // Render a fresh list. Should only be called for first renders, or to render
   // a new list. Otherwise, use `update` to do a smart render.
-  render(list) {
-    if (list) {
-      this.list = list;
-    }
+  render() {
     var offset = this.initialIndex;
     var length = quantize(this.dataContainerDimensions[this.containerDim], this.unit);
     this._update(offset, length, true);
