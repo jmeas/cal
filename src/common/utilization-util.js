@@ -1,5 +1,8 @@
 import packingUtil from './packing-util';
 
+// These are inclusive start, inclusive end algorithms, because
+// they work with utilizations, which have inclusive boundaries.
+// Note that this behavior is different from dateUtil!
 var utilizationUtil = {
   // Whether or not utilization `one` overlaps with utilization `two`
   overlap(one, two) {
@@ -16,18 +19,7 @@ var utilizationUtil = {
   // Whether `two` is after `one`
   isBefore(one, two) {
     return two.lastDayTimestamp < one.firstDayTimestamp;
-  },
-
-  // This assigns each utilization in a list a "position." A position
-  // is for the graphical representation of a utilization. It determines
-  // how far over the utilization is in the list.
-  assignPositions(utilizations) {
-    return packingUtil({
-      rectangles: utilizations,
-      startProp: 'firstDayTimestamp',
-      endProp: 'lastDayTimestamp'
-    });
   }
 };
 
-export default visualizationUtil;
+export default utilizationUtil;
