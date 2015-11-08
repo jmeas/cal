@@ -33,7 +33,7 @@ export default function({rectangles, startProp, endProp}) {
       return;
     }
 
-    // Add it to the current group
+    // Otherwise, add it to the current group
     group.members.push(r);
     // Update the end of the group if this extends its length
     if (r[endProp] > group.end) {
