@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import containedPeriodicValues from 'contained-periodic-values';
 
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -27,21 +28,41 @@ const formatMethods = {
 var dateUtil = {
   millisecondsPerDay: MILLISECONDS_PER_DAY,
 
+  // Create a local date from a `dateString` format of "YYYY-MM-DD".
+  // `new Date(dateString)` cannot be used because of its inconsistent nature
+  // around timezones. In `cal`, the day value refers to a day, rather than
+  // a specific datetime. If a date is created via `new Date` as UTC, then in certain
+  // timezones the created date will have a different day than what was specified in the
+  // string. For instance: '2015-01-14'. This is supposed to represent January 14th, 2015,
+  // but on the east coast it will be created as `Tue Jan 13 2015 19:00:00 GMT-0500`.
+  // Note that the behavior of `new Date(dateString)` isn't consistent across browsers,
+  // but this method smooths out the inconsistencies and always works as expected.
+  create(dateString) {
+    var parts = dateString.split('-');
+    // Convert them to integers
+    parts = _.map(parts, p => parseInt(p, 10));
+    // Months are 0 indexed
+    parts[1]--;
+    return new Date(...parts);
+  },
+
   // Returns a clone of `date`
   cloneDate(date) {
     return new Date(date.getTime());
   },
 
-  // Return `date` coerced to UTC
-  utc(date) {
-    date = dateUtil.cloneDate(date);
-    return date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-  },
-
   // The number of days between `dateOne` and `dateTwo`
+  // We can't use milliseconds here because of daylight savings: some days
+  // have fewer than 24 hours between them.
   daysBetween(dateOne, dateTwo) {
-    dateOne = utc(dateOne);
-    dateTwo = utc(dateTwo);
+    function treatAsUTC(date) {
+      var result = dateUtil.cloneDate(date);
+      result.setMinutes(result.getMinutes() - result.getTimezoneOffset());
+      return result;
+    }
+
+    dateOne = treatAsUTC(dateOne);
+    dateTwo = treatAsUTC(dateTwo);
     return (dateTwo - dateOne) / MILLISECONDS_PER_DAY;
   },
 
@@ -96,20 +117,22 @@ var dateUtil = {
     return dateUtil.addDays(date, sign * days);
   },
 
+  // Subtract `days` from `date`
+  subtractWeekDays(date, days) {
+    return dateUtil.addWeekDays(date, -days);
+  },
+
   // Add `days` to `date`
+  // We can't use milliseconds here because in timezones with daylight
+  // savings some days don't have 24 hours in them.
   addDays(date, days) {
     date = dateUtil.cloneDate(date);
-    date.setTime(date.getTime() + days * MILLISECONDS_PER_DAY);
+    date.setDate(date.getDate() + days);
     return date;
   },
 
   subtractDays(date, days) {
     return dateUtil.addDays(date, -days);
-  },
-
-  // Subtract `days` from `date`
-  subtractWeekDays(date, days) {
-    return dateUtil.addWeekDays(date, -days);
   },
 
   // Is `date` during a western work week?
