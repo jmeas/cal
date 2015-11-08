@@ -5,7 +5,7 @@ import employeeGenerator from './mock/employee-generator';
 // How many employees we're testing out
 var employeeCount = 96;
 // This is how many total utilizations we render
-var utilizationCount = 40;
+var utilizationCount = 0;
 
 var employees = employeeGenerator({employeeCount, utilizationCount});
 employees = _.sortBy(employees, 'name');
