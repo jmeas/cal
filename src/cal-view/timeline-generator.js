@@ -36,4 +36,4 @@ export default function({ referenceDate, back, forward, scale = 'days' }) {
     index++;
   }
   return dates;
-};
+}

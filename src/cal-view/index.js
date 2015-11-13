@@ -66,7 +66,8 @@ _.extend(CalView.prototype, {
       unitWidth: config.xAxisCellWidth,
       unitHeight: config.yAxisCellHeight,
       initialXIndex: 0,
-      initialYIndex: offsets.back
+      initialYIndex: offsets.back,
+      el: getElementByHook('data-container')
     });
   },
 

@@ -2,9 +2,7 @@ import _ from 'lodash';
 import DomPool from 'dom-pool';
 import quantize from '../common/quantize';
 import UtilizationView from '../utilization-view';
-import EmployeeNodeManager from './employee-node-manager';
 import ManagerManager from './manager-manager';
-import getElementByHook from '../common/get-element-by-hook';
 
 // Assuming 20 people are rendered, with 40  dates,
 // this is the maximum size of what could be displayed (20 * 40 = 800)
@@ -17,7 +15,7 @@ const MAX_Y_SPEED = 6;
 
 function DataContainerView(options) {
   _.extend(this, options);
-  this._setEl();
+  this.container = this.el.children[0];
   this._createPool();
   this._createManagers();
 }
@@ -67,11 +65,6 @@ _.extend(DataContainerView.prototype, {
     });
   },
 
-  _setEl() {
-    this.el = getElementByHook('data-container');
-    this.data = this.el.children[0];
-  },
-
   _createPool() {
     this.pool = new DomPool({
       tagName: 'div'
@@ -80,12 +73,9 @@ _.extend(DataContainerView.prototype, {
   },
 
   _createManagers() {
-    this._managers = _.map(this.employees, e => new EmployeeNodeManager({
-      employee: e,
-      pool: this.pool
-    }));
     this._managerManager = new ManagerManager({
-      managers: this._managers
+      employees: this.employees,
+      el: this.container
     });
   },
 

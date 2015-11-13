@@ -142,7 +142,7 @@ var dateUtil = {
 
   // Is `date` a Saturday or Sunday?
   isWeekendDay(date) {
-    return date.getDay() == 6 || date.getDay() == 0;
+    return date.getDay() === 6 || date.getDay() === 0;
   },
 
   // Whether or not `dateOne` and `dateTwo` occur on the same day

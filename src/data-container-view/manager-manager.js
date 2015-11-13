@@ -1,8 +1,10 @@
 import _ from 'lodash';
+import EmployeeNodeManager from './employee-node-manager';
 
 // This manages our EmployeeNodeManagers
 function ManagerManager(options) {
   _.extend(this, options);
+  this._createManagers();
 }
 
 _.extend(ManagerManager.prototype, {
@@ -15,6 +17,13 @@ _.extend(ManagerManager.prototype, {
   _lastXIndex: undefined,
   _firstYIndex: undefined,
   _lastYIndex: undefined,
+
+  _createManagers() {
+    this._managers = _.map(this.employees, e => new EmployeeNodeManager({
+      employee: e,
+      pool: this.pool
+    }));
+  }
 });
 
 export default ManagerManager;

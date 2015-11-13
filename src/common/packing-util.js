@@ -78,4 +78,4 @@ export default function({rectangles, startProp, endProp}) {
   });
 
   return rectangles;
-};
+}
