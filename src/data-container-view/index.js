@@ -46,7 +46,7 @@ _.extend(DataContainerView.prototype, {
       scrollLeft = this.unitWidth * this.initialXIndex;
     }
     if (_.isUndefined(scrollTop)) {
-      scrollLeft = this.unitHeight * this.initialYIndex;
+      scrollTop = this.unitHeight * this.initialYIndex;
     }
     // Quantize and pad our values
     var quantizedScrollLeft = quantize(scrollLeft, this.unitWidth);
