@@ -6,8 +6,8 @@ function ManagerManager(options) {
 }
 
 _.extend(ManagerManager.prototype, {
-  update({}) {
-    console.log('rendering!');
+  update(options) {
+    // console.log('rendering!', options);
   },
 
   // These indices keep track of where we begin and end along each axis

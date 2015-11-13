@@ -79,9 +79,9 @@ _.extend(CalView.prototype, {
     this.dataContainerView.render();
     this.setScroll();
     // This causes an immediate scroll event because it's synchronous
-    // with the above `setScroll`. If I don't want that, I can setTimeout
-    // by 25ms, and then manually set the scroll. The axes are smart
-    // and won't re-render.
+    // with the above `setScroll`. If I don't want that, I could probbaly setTimeout
+    // by 25ms, and then manually set the scroll. Nevertheless, the axes are smart
+    // and won't re-render as it is now.
     this.registerScrollEvent();
     this.registerMousemoveEvent();
     this.registerResizeEvent();
@@ -164,7 +164,7 @@ _.extend(CalView.prototype, {
       scrollOffset: scrollLeft,
       speed: xSpeed
     });
-    this.dataContainerView.update({
+    this.dataContainerView.render({
       scrollLeft,
       scrollTop,
       totalSpeed
