@@ -160,11 +160,11 @@ _.extend(CalView.prototype, {
       totalSpeed = xSpeed + ySpeed;
     }
 
-    this.timeAxisView.update({
+    this.timeAxisView.render({
       scrollOffset: scrollTop,
       speed: ySpeed
     });
-    this.employeeAxisView.update({
+    this.employeeAxisView.render({
       scrollOffset: scrollLeft,
       speed: xSpeed
     });

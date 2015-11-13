@@ -4,26 +4,14 @@ import NodeListManager from './node-list-manager';
 
 function AxisView(options) {
   _.extend(this, options);
-  this._setContainer();
+  // The container element is where the individual items are rendered into.
+  this.container = this.el.children[0];
   this._createNodeListManager();
 }
 
 _.extend(AxisView.prototype, {
-  // Render a fresh list. Should only be called for first renders, or to render
-  // a new list. Otherwise, use `update` to do a smart render.
-  render() {
-    var offset = this.initialIndex;
-    var length = quantize(this.dataContainerDimensions[this.containerDim], this.unit);
-    this._update(offset, length);
-  },
-
-  // Keeps track of whether or not we have a scheduled render. This comes into play
-  // when the user is scrolling really fast.
-  _deferredUpdate: undefined,
-
-  // This intelligently updates the view. It only updates if the user isn't scrolling
-  // too fast! Otherwise, it waits for them to slow down.
-  update({scrollOffset, speed}) {
+  // This intelligently renders the view.
+  render({scrollOffset, speed} = {}) {
     // Clear any existing update we might have in store
     clearTimeout(this._deferredUpdate);
 
@@ -39,11 +27,6 @@ _.extend(AxisView.prototype, {
     }
   },
 
-  // The container element is where the individual items are rendered into.
-  _setContainer() {
-    this.container = this.el.children[0];
-  },
-
   // The NodeListManager manages the smart updating of our list.
   _createNodeListManager() {
     this.nodeListManager = new NodeListManager({
@@ -56,8 +39,17 @@ _.extend(AxisView.prototype, {
     });
   },
 
+  // Keeps track of whether or not we have a scheduled render. This comes into play
+  // when the user is scrolling really fast.
+  _deferredUpdate: undefined,
+
   // Tell the NodeListManager to update the list
   _update(scrollOffset) {
+    // If we don't have a scrollOffset, then we use the initial index. This happens
+    // when it's an initial render
+    if (_.isUndefined(scrollOffset)) {
+      scrollOffset = this.initialIndex;
+    }
     // Quantize and pad our values
     var quantizedOffset = quantize(scrollOffset, this.unit);
     var quantizedLength = quantize(this.dataContainerDimensions[this.containerDim], this.unit);
