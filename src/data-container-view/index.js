@@ -70,7 +70,7 @@ _.extend(DataContainerView.prototype, {
   _deferredUpdate: undefined,
 
   _update(options) {
-    this._managerManager(options)
+    this._managerManager.update(options);
   },
 
   _setEl() {

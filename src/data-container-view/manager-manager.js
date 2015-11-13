@@ -7,10 +7,10 @@ function ManagerManager(options) {
 
 _.extend(ManagerManager.prototype, {
   update({}) {
-    console.log('rendering!', firstIndex, lastIndex);
+    console.log('rendering!');
   },
 
-    // These indices keep track of where we begin and end along each axis
+  // These indices keep track of where we begin and end along each axis
   _firstXIndex: undefined,
   _lastXIndex: undefined,
   _firstYIndex: undefined,

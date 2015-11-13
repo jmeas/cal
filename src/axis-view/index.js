@@ -26,18 +26,15 @@ _.extend(AxisView.prototype, {
   update({scrollOffset, speed}) {
     // Clear any existing update we might have in store
     clearTimeout(this._deferredUpdate);
-    // Quantize and pad our values
-    var quantizedScrollLeft = quantize(scrollOffset, this.unit);
-    var quantizedWidth = quantize(this.dataContainerDimensions[this.containerDim], this.unit);
 
     // If the user isn't scrolling too fast, then we do a smart update.
     // Otherwise, we schedule an update for the future, when they might
     // be scrolling a bit slower.
     if (!speed || speed < 6) {
-      this._update(quantizedScrollLeft, quantizedWidth);
+      this._update(scrollOffset);
     } else {
       this._deferredUpdate = window.setTimeout(() => {
-        this._update(quantizedScrollLeft, quantizedWidth);
+        this._update(scrollOffset);
       }, 50);
     }
   },
@@ -59,6 +56,19 @@ _.extend(AxisView.prototype, {
     });
   },
 
+  // Tell the NodeListManager to update the list
+  _update(scrollOffset) {
+    // Quantize and pad our values
+    var quantizedOffset = quantize(scrollOffset, this.unit);
+    var quantizedLength = quantize(this.dataContainerDimensions[this.containerDim], this.unit);
+    var {firstIndex, lastIndex} = this._getIndices(quantizedOffset, quantizedLength);
+    this.nodeListManager.update({
+      list: this.list,
+      firstIndex,
+      lastIndex
+    });
+  },
+
   // Gets the right indices given an offset (as an index)
   // and a length (in units of indices)
   _getIndices(offset, length) {
@@ -68,16 +78,6 @@ _.extend(AxisView.prototype, {
     var firstIndex = offset - startPadding;
     var lastIndex = endOffset + bottomPadding;
     return {firstIndex, lastIndex};
-  },
-
-  // Tell the NodeListManager to update the list
-  _update(offset, length) {
-    var {firstIndex, lastIndex} = this._getIndices(offset, length);
-    this.nodeListManager.update({
-      list: this.list,
-      firstIndex,
-      lastIndex
-    });
   }
 });
 
