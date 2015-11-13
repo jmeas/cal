@@ -14,7 +14,7 @@ _.extend(AxisView.prototype, {
   render() {
     var offset = this.initialIndex;
     var length = quantize(this.dataContainerDimensions[this.containerDim], this.unit);
-    this._update(offset, length, true);
+    this._update(offset, length);
   },
 
   // Keeps track of whether or not we have a scheduled render. This comes into play
@@ -70,9 +70,8 @@ _.extend(AxisView.prototype, {
     return {firstIndex, lastIndex};
   },
 
-  // Tell the NodeListManager to update the list. Pass `clean` as `true` to
-  // render a brand new chunk, rather than doing a smart update.
-  _update(offset, length, clean) {
+  // Tell the NodeListManager to update the list
+  _update(offset, length) {
     var {firstIndex, lastIndex} = this._getIndices(offset, length);
     this.nodeListManager.update({
       list: this.list,
