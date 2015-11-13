@@ -4,6 +4,7 @@ import AxisView from '../axis-view';
 import DataContainerView from '../data-container-view';
 import timelineGenerator from './timeline-generator';
 import dateUtil from '../common/date-util';
+import getElementByHook from '../common/get-element-by-hook';
 
 // The CalView is the parent view of the entire calendar.
 // The View itself mostly ensures that the axes and data container
@@ -14,16 +15,11 @@ function CalView({employees, date}) {
   this.date = date;
   this.dataContainerDimensions = {};
   this.createTimeline(this.date);
-  this._setEl();
   this.setupChildren();
   this.takeDataContainerMeasurement();
 }
 
 _.extend(CalView.prototype, {
-  _setEl() {
-    this.el = document.getElementsByTagName('main')[0];
-  },
-
   createTimeline(date) {
     var offsets = config.timelineOffsets[this.scale];
     this.timeline = timelineGenerator({
@@ -49,7 +45,7 @@ _.extend(CalView.prototype, {
       formatFn(date) {
         return dateUtil.format(date, 'word');
       },
-      el: document.getElementsByClassName('y-axis')[0]
+      el: getElementByHook('y-axis')
     });
     this.employeeAxisView = new AxisView({
       list: this.employees,
@@ -61,7 +57,7 @@ _.extend(CalView.prototype, {
       displayProp: 'name',
       dimension: 'left',
       containerDim: 'width',
-      el: document.getElementsByClassName('x-axis')[0]
+      el: getElementByHook('x-axis')
     });
     this.dataContainerView = new DataContainerView({
       employees: this.employees,

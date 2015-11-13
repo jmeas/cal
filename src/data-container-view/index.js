@@ -4,6 +4,7 @@ import quantize from '../common/quantize';
 import UtilizationView from '../utilization-view';
 import EmployeeNodeManager from './employee-node-manager';
 import ManagerManager from './manager-manager';
+import getElementByHook from '../common/get-element-by-hook';
 
 // Assuming 20 people are rendered, with 40  dates,
 // this is the maximum size of what could be displayed (20 * 40 = 800)
@@ -74,8 +75,8 @@ _.extend(DataContainerView.prototype, {
   },
 
   _setEl() {
-    this.el = document.getElementsByClassName('data-container')[0];
-    this.data = document.getElementsByClassName('data')[0];
+    this.el = getElementByHook('data-container');
+    this.data = this.el.children[0];
   },
 
   _createPool() {
