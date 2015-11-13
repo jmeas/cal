@@ -48,7 +48,7 @@ _.extend(AxisView.prototype, {
     // If we don't have a scrollOffset, then we use the initial index. This happens
     // when it's an initial render
     if (_.isUndefined(scrollOffset)) {
-      scrollOffset = this.initialIndex;
+      scrollOffset = this.initialIndex * this.unit;
     }
     // Quantize and pad our values
     var quantizedOffset = quantize(scrollOffset, this.unit);
