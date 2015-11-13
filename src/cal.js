@@ -10,7 +10,7 @@ var utilizationCount = 0;
 var employees = employeeGenerator({employeeCount, utilizationCount});
 employees = _.sortBy(employees, 'name');
 
-console.log('employees:', employees);
+// console.log('employees:', employees);
 
 // Let's keep track of how performant we're being
 var start = performance.now();

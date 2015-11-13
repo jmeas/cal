@@ -79,8 +79,6 @@ _.extend(AxisView.prototype, {
       firstIndex,
       lastIndex
     });
-    this.firstIndex = firstIndex;
-    this.lastIndex = lastIndex;
   }
 });
 

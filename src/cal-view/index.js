@@ -64,7 +64,13 @@ _.extend(CalView.prototype, {
       el: document.getElementsByClassName('x-axis')[0]
     });
     this.dataContainerView = new DataContainerView({
-      employees: this.employees
+      employees: this.employees,
+      timeline: this.timeline,
+      dataContainerDimensions: this.dataContainerDimensions,
+      unitWidth: config.xAxisCellWidth,
+      unitHeight: config.yAxisCellHeight,
+      initialXIndex: 0,
+      initialYIndex: offsets.back
     });
   },
 
@@ -142,13 +148,16 @@ _.extend(CalView.prototype, {
   _onDataContainerScroll(timestamp) {
     clearTimeout(this._clearScrollDataId);
     var {scrollLeft, scrollTop} = this.dataContainerView.el;
-    var ySpeed, xSpeed, tDelta, yDelta, xDelta;
+    var ySpeed, xSpeed, tDelta, yDelta, xDelta, totalSpeed, xPercent, yPercent;
     if (this._lastTimestamp) {
       yDelta = scrollTop - this._lastPositionY;
       xDelta = scrollLeft - this._lastPositionX;
       tDelta = timestamp - this._lastTimestamp;
       ySpeed = Math.abs(yDelta / tDelta);
       xSpeed = Math.abs(xDelta / tDelta);
+      // This is a simple approximation of the magnitude of the velocity vector. It
+      // works fine for the algorithms in use by this app.
+      totalSpeed = xSpeed + ySpeed;
     }
 
     this.timeAxisView.update({
@@ -158,6 +167,11 @@ _.extend(CalView.prototype, {
     this.employeeAxisView.update({
       scrollOffset: scrollLeft,
       speed: xSpeed
+    });
+    this.dataContainerView.update({
+      scrollLeft,
+      scrollTop,
+      totalSpeed
     });
     this.timeAxisView.container.style.top = `-${scrollTop}px`;
     this.employeeAxisView.container.style.left = `-${scrollLeft}px`;
