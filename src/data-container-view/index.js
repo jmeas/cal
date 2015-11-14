@@ -82,7 +82,7 @@ _.extend(DataContainerView.prototype, {
   _computeXIndices(offset, length) {
     var endOffset = offset + length;
     var startPadding = Math.min(X_PADDING, offset);
-    var bottomPadding = Math.min(X_PADDING, this.employees.length - endOffset);
+    var bottomPadding = Math.min(X_PADDING, this.employees.length - endOffset - 1);
     var firstXIndex = offset - startPadding;
     var lastXIndex = endOffset + bottomPadding;
     return {firstXIndex, lastXIndex};
@@ -91,7 +91,7 @@ _.extend(DataContainerView.prototype, {
   _computeYIndices(offset, length) {
     var endOffset = offset + length;
     var startPadding = Math.min(Y_PADDING, offset);
-    var bottomPadding = Math.min(Y_PADDING, this.timeline.length - endOffset);
+    var bottomPadding = Math.min(Y_PADDING, this.timeline.length - endOffset - 1);
     var firstYIndex = offset - startPadding;
     var lastYIndex = endOffset + bottomPadding;
     return {firstYIndex, lastYIndex};

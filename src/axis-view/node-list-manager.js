@@ -54,8 +54,7 @@ _.extend(NodeListManager.prototype, {
       return this.initialRender({firstIndex, lastIndex, list});
     }
 
-    // Determine whether we're going forward or back. If we have
-    // no children, we just assume that we're going forward.
+    // Determine whether we're going forward or back.
     var directionSign;
     if (this._firstIndex !== 0) {
       directionSign = firstIndex < this._firstIndex ? -1 : 1;
@@ -79,7 +78,7 @@ _.extend(NodeListManager.prototype, {
     // Otherwise, we do an intelligent update by adding and removing nodes
     else {
       this._removeNodes({directionSign, removeDelta});
-      this._addNodes({directionSign, list, totalSize, addDelta});
+      this._addNodes({directionSign, list, addDelta});
       this._firstIndex = firstIndex;
       this._lastIndex = lastIndex;
     }
@@ -121,7 +120,7 @@ _.extend(NodeListManager.prototype, {
     });
   },
 
-  _addNodes({directionSign, list, totalSize, addDelta}) {
+  _addNodes({directionSign, list, addDelta}) {
     // Anchor ourselves based on the direction that we're moving toward
     var anchor = directionSign > 0 ? this._lastIndex : this._firstIndex;
 
