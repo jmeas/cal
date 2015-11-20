@@ -7,7 +7,7 @@ var widthUnit = 140;
 var heightUnit = 35;
 
 // Return a single utilization
-function utilizationGenerator(leftIndex) {
+function utilizationGenerator() {
   var topIndex = _.random(0, 350);
   var height = _.random(1, 10);
   var r = _.random(0, 255);
@@ -17,10 +17,8 @@ function utilizationGenerator(leftIndex) {
     name: 'Project X',
     height: height * heightUnit,
     width: widthUnit,
-    leftIndex: leftIndex,
     topIndex: topIndex,
     bottomIndex: topIndex + height - 1,
-    left: leftIndex * widthUnit,
     top: topIndex * heightUnit,
     color: `rgba(${r},${g},${b},0.8)`
   };
@@ -32,7 +30,7 @@ function employeeGenerator({employeeCount = 0, utilizationCount = 0}) {
   _.times(employeeCount, n => {
     name = _.sample(names);
     utilizations = _.times(utilizationCount, () => {
-      return utilizationGenerator(n);
+      return utilizationGenerator();
     });
     utilizations = _.sortByOrder(utilizations, ['topIndex', 'height'], ['asc', 'desc']);
     packingUtil({

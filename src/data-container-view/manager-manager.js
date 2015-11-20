@@ -59,8 +59,9 @@ _.extend(ManagerManager.prototype, {
   _lastYIndex: undefined,
 
   _createManagers() {
-    this._managers = _.map(this.employees, e => new EmployeeNodeManager({
+    this._managers = _.map(this.employees, (e, i) => new EmployeeNodeManager({
       employee: e,
+      index: i,
       pool: this.pool,
       el: this.el
     }));

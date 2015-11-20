@@ -37,7 +37,7 @@ _.extend(EmployeeNodeManager.prototype, {
     _.times(size, n => {
       n += indices.firstIndex;
       var u = this.employee.utilizations[n];
-      var uView = new UtilizationView(u);
+      var uView = new UtilizationView(u, this.index);
       fragment.appendChild(uView.el);
     });
     this.el.appendChild(fragment);
