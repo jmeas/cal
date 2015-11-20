@@ -8,7 +8,7 @@ function ManagerManager(options) {
 }
 
 _.extend(ManagerManager.prototype, {
-  update({firstXIndex, lastXIndex, firstYIndex, lastYIndex}) {
+  update({firstXIndex, lastXIndex, firstYIndex, lastYIndex, xDirection, yDirection}) {
     // If we have no current index, then this must be the first render
     if (_.isUndefined(this._firstYIndex)) {
       this._initialRender({firstXIndex, lastXIndex, firstYIndex, lastYIndex});
@@ -20,29 +20,22 @@ _.extend(ManagerManager.prototype, {
     // If nothing has been updated, then bail
     if (!xChanged && !yChanged) { return; }
 
-    // Start by computing whether we're moving left or right
-    var xDirectionSign;
-    if (this._firstXIndex !== 0) {
-      xDirectionSign = firstXIndex < this._firstXIndex ? -1 : 1;
-    } else {
-      xDirectionSign = lastXIndex < this._lastXIndex ? -1 : 1;
-    }
-
     // Calculate our change in both directions
     var backwardDelta = Math.abs(this._firstXIndex - firstXIndex);
     var forwardDelta = Math.abs(this._lastXIndex - lastXIndex);
 
     // How many we're deleting
-    var removeDelta = xDirectionSign > 0 ? backwardDelta : forwardDelta;
+    var removeDelta = xDirection > 0 ? backwardDelta : forwardDelta;
 
-    this._broadcastDelete({xDirectionSign, removeDelta, firstXIndex});
+    this._broadcastDelete({xDirection, removeDelta, firstXIndex});
 
     // Broadcast our update.
     this._broadcastUpdate({
       firstXIndex,
       lastXIndex,
       firstYIndex,
-      lastYIndex
+      lastYIndex,
+      yDirection
     });
 
     // Update our indices
@@ -83,10 +76,10 @@ _.extend(ManagerManager.prototype, {
 
   // This causes the employee node managers that have scrolled out of
   // view to clear all of their cells.
-  _broadcastDelete({xDirectionSign, removeDelta, firstXIndex}) {
+  _broadcastDelete({xDirection, removeDelta, firstXIndex}) {
     var targetIndex, relativeIndex;
     _.times(removeDelta, n => {
-      relativeIndex = xDirectionSign < 0 ? this._lastXIndex : firstXIndex - 1;
+      relativeIndex = xDirection < 0 ? this._lastXIndex : firstXIndex - 1;
       targetIndex = relativeIndex - n;
       this._managers[targetIndex].clear();
     });
@@ -94,13 +87,14 @@ _.extend(ManagerManager.prototype, {
 
   // Tell all of the managers between the X indices to intelligently render
   // based on the Y indices.
-  _broadcastUpdate({firstXIndex, lastXIndex, firstYIndex, lastYIndex}) {
+  _broadcastUpdate({firstXIndex, lastXIndex, firstYIndex, lastYIndex, yDirection}) {
     var size = lastXIndex - firstXIndex + 1;
     _.times(size, n => {
       n += firstXIndex;
       this._managers[n].render({
         firstIndex: firstYIndex,
-        lastIndex: lastYIndex
+        lastIndex: lastYIndex,
+        direction: yDirection
       });
     });
   }

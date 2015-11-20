@@ -62,7 +62,7 @@ _.extend(NodeListManager.prototype, {
       directionSign = lastIndex < this._lastIndex ? -1 : 1;
     }
 
-    var totalSize = lastIndex - firstIndex;
+    var totalSize = lastIndex - firstIndex + 1;
     var backwardDelta = Math.abs(this._firstIndex - firstIndex);
     var forwardDelta = Math.abs(this._lastIndex - lastIndex);
 

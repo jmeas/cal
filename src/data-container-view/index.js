@@ -21,7 +21,7 @@ function DataContainerView(options) {
 }
 
 _.extend(DataContainerView.prototype, {
-  render({scrollLeft, scrollTop, totalSpeed} = {}) {
+  render({scrollLeft, scrollTop, totalSpeed, xDirection, yDirection} = {}) {
     // Clear any existing update we might have in store
     clearTimeout(this._deferredUpdate);
 
@@ -29,10 +29,10 @@ _.extend(DataContainerView.prototype, {
     // Otherwise, we schedule an update for the future, when they might
     // be scrolling a bit slower.
     if (!totalSpeed || totalSpeed < 6) {
-      this._update({scrollLeft, scrollTop});
+      this._update({scrollLeft, scrollTop, xDirection, yDirection});
     } else {
       this._deferredUpdate = window.setTimeout(() => {
-        this._update({scrollLeft, scrollTop});
+        this._update({scrollLeft, scrollTop, xDirection, yDirection});
       }, 50);
     }
   },
@@ -41,7 +41,7 @@ _.extend(DataContainerView.prototype, {
   // when the user is scrolling really fast.
   _deferredUpdate: undefined,
 
-  _update({scrollLeft, scrollTop} = {}) {
+  _update({scrollLeft, scrollTop, xDirection, yDirection} = {}) {
     if (_.isUndefined(scrollLeft)) {
       scrollLeft = this.unitWidth * this.initialXIndex;
     }
@@ -61,7 +61,9 @@ _.extend(DataContainerView.prototype, {
       firstXIndex,
       lastXIndex,
       firstYIndex,
-      lastYIndex
+      lastYIndex,
+      xDirection,
+      yDirection
     });
   },
 

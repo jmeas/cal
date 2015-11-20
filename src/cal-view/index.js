@@ -136,6 +136,11 @@ _.extend(CalView.prototype, {
   _lastPositionX: null,
   _clearScrollDataId: null,
 
+  // These are never cleared; they're used for determining the direction
+  // of the scroll along each axis
+  _cachedPositionY: null,
+  _cachedPositionX: null,
+
   _clearOldScrollData() {
     this._lastTimestamp = null;
     this._lastPositionX = null;
@@ -157,18 +162,25 @@ _.extend(CalView.prototype, {
       totalSpeed = xSpeed + ySpeed;
     }
 
+    xDirection = Math.sign(scrollLeft - this._cachedPositionX);
+    yDirection = Math.sign(scrollTop - this._cachedPositionY);
+
     this.timeAxisView.render({
       scrollOffset: scrollTop,
-      speed: ySpeed
+      speed: ySpeed,
+      direction: yDirection
     });
     this.employeeAxisView.render({
       scrollOffset: scrollLeft,
-      speed: xSpeed
+      speed: xSpeed,
+      direction: xDirection
     });
     this.dataContainerView.render({
       scrollLeft,
       scrollTop,
-      totalSpeed
+      totalSpeed,
+      xDirection,
+      yDirection
     });
     this.timeAxisView.container.style.top = `-${scrollTop}px`;
     this.employeeAxisView.container.style.left = `-${scrollLeft}px`;
@@ -177,6 +189,8 @@ _.extend(CalView.prototype, {
     // Update our new positions and timestamp, then set it to expire in 30ms
     this._lastPositionY = scrollTop;
     this._lastPositionX = scrollLeft;
+    this._cachedPositionY = scrollTop;
+    this._cachedPositionX = scrollLeft;
     this._lastTimestamp = timestamp;
     this._clearScrollDataId = setTimeout(this._clearOldScrollData.bind(this), 30);
   },
