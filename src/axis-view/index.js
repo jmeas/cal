@@ -66,7 +66,7 @@ _.extend(AxisView.prototype, {
   _getIndices(offset, length) {
     var endOffset = offset + length;
     var startPadding = Math.min(this.padding, offset);
-    var bottomPadding = Math.min(this.padding, this.list.length - endOffset - 1);
+    var bottomPadding = Math.min(this.padding, this.list.length - endOffset);
     var firstIndex = offset - startPadding;
     var lastIndex = endOffset + bottomPadding;
     return {firstIndex, lastIndex};

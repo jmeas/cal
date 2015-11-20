@@ -35,7 +35,7 @@ _.extend(ManagerManager.prototype, {
     // How many we're deleting
     var removeDelta = xDirectionSign > 0 ? backwardDelta : forwardDelta;
 
-    this._broadcastDelete({xDirectionSign, removeDelta});
+    this._broadcastDelete({xDirectionSign, removeDelta, firstXIndex});
 
     // Broadcast our update.
     this._broadcastUpdate({
@@ -61,23 +61,31 @@ _.extend(ManagerManager.prototype, {
   _createManagers() {
     this._managers = _.map(this.employees, e => new EmployeeNodeManager({
       employee: e,
-      pool: this.pool
+      pool: this.pool,
+      el: this.el
     }));
   },
 
   _initialRender({firstXIndex, lastXIndex, firstYIndex, lastYIndex}) {
+    this._clearAll();
+    this._broadcastUpdate({firstXIndex, lastXIndex, firstYIndex, lastYIndex});
     this._firstXIndex = firstXIndex;
     this._lastXIndex = lastXIndex;
     this._firstYIndex = firstYIndex;
     this._lastYIndex = lastYIndex;
   },
 
+  // Ensure that all of our children are clear
+  _clearAll() {
+    this._managers.forEach(m => m.clear());
+  },
+
   // This causes the employee node managers that have scrolled out of
   // view to clear all of their cells.
-  _broadcastDelete({xDirectionSign, removeDelta}) {
+  _broadcastDelete({xDirectionSign, removeDelta, firstXIndex}) {
     var targetIndex, relativeIndex;
     _.times(removeDelta, n => {
-      relativeIndex = xDirectionSign < 0 ? this._lastXIndex : this._firstXIndex;
+      relativeIndex = xDirectionSign < 0 ? this._lastXIndex : firstXIndex - 1;
       targetIndex = relativeIndex - n;
       this._managers[targetIndex].clear();
     });
@@ -86,9 +94,13 @@ _.extend(ManagerManager.prototype, {
   // Tell all of the managers between the X indices to intelligently render
   // based on the Y indices.
   _broadcastUpdate({firstXIndex, lastXIndex, firstYIndex, lastYIndex}) {
-    var size = lastYIndex - firstYIndex + 1;
+    var size = lastXIndex - firstXIndex + 1;
     _.times(size, n => {
-      this._managers[n].render({firstYIndex, lastYIndex});
+      n += firstXIndex;
+      this._managers[n].render({
+        firstIndex: firstYIndex,
+        lastIndex: lastYIndex
+      });
     });
   }
 });
