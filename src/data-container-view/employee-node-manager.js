@@ -27,11 +27,16 @@ _.extend(EmployeeNodeManager.prototype, {
     var backwardDelta = Math.abs(this._firstIndex - firstIndex);
     var forwardDelta = Math.abs(this._lastIndex - lastIndex);
 
+    // if (backwardDelta > this._children.length) {
+    //   var u = this.employee.utilizations;
+    //   console.log(':', u.length, this._children.length, this._firstIndex, firstIndex);
+    // }
+
     var removeDelta = direction > 0 ? backwardDelta : forwardDelta;
     var addDelta = direction > 0 ? forwardDelta : backwardDelta;
 
-    this._removeNodes({direction, removeDelta});
-    this._addNodes({direction, list, addDelta});
+    // this._removeNodes({direction, removeDelta});
+    this._addNodes({direction, addDelta});
 
     this._firstIndex = firstIndex;
     this._lastIndex = lastIndex;
@@ -51,23 +56,21 @@ _.extend(EmployeeNodeManager.prototype, {
 
   _removeNodes({direction, removeDelta}) {
     // If we have no nodes, then there's nothing to remove!
-    // if (!this._children.length) { return; }
-
-    // var targetNode, nodePosition;
-    // var initialLength = this._children.length;
-    // _.times(removeDelta, () => {
-    //   // We either remove from the start or end of the list, depending
-    //   // on the direction of scrolling
-    //   nodePosition = direction > 0 ? 'firstChild' : 'lastChild';
-    //   targetNode = this.el[nodePosition];
-    //   // If the node exists, then we remove it and push back the element into the pool
-    //   if (targetNode) {
-    //     this.pool.push(this.el.removeChild(targetNode));
-    //   }
-    // });
+    if (!this._children.length) { return; }
+    var length = this._children.length;
+    var targetIndex, relativeIndex;
+    // console.log('THE LENGTH', this._children.length, removeDelta);
+    _.times(removeDelta, n => {
+      n = direction < 0 ? this._children.length - 1 : 0;
+      // console.log('wat', n, this._children.length);
+      // Remove the node from the page
+      this._children[n].el.remove();
+      // Remove the view from the children array
+      this._children.splice(targetIndex, 1);
+    });
   },
 
-  _addNodes({direction, list, addDelta}) {},
+  _addNodes({direction, addDelta}) {},
 
   _initialRender({firstIndex, lastIndex}) {
     var size = lastIndex - firstIndex + 1;
