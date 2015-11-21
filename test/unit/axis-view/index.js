@@ -136,6 +136,14 @@ describe('AxisView', () => {
         expect(result.lastIndex).to.equal(19);
       });
     });
+
+    describe('with an offset of 0', () => {
+      it('should return the correct indices', () => {
+        var result = axisView._getIndices(15, 0);
+        expect(result.firstIndex).to.equal(12);
+        expect(result.lastIndex).to.equal(18);
+      });
+    });
   });
 
   describe('_update', () => {
