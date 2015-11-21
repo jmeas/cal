@@ -79,7 +79,10 @@ _.extend(CalView.prototype, {
     this.employeeAxisView.render({
       length: quantizedWidth
     });
-    this.dataContainerView.render();
+    this.dataContainerView.render({
+      width: quantizedWidth,
+      height: quantizedHeight
+    });
     this.setScroll();
     // This causes an immediate scroll event because it's synchronous
     // with the above `setScroll`. If I don't want that, I could probbaly setTimeout
@@ -185,8 +188,10 @@ _.extend(CalView.prototype, {
       direction: xDirection
     });
     this.dataContainerView.render({
-      scrollLeft,
-      scrollTop,
+      left: quantizedLeft,
+      top: quantizedTop,
+      width: quantizedWidth,
+      height: quantizedHeight,
       speed: totalSpeed,
       xDirection,
       yDirection

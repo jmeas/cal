@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import DomPool from 'dom-pool';
-import quantize from '../common/quantize';
 import UtilizationView from '../utilization-view';
 import ListViewMixin from '../common/list-view-mixin';
 import ManagerManager from './manager-manager';
@@ -23,21 +22,17 @@ function DataContainerView(options) {
 
 _.extend(DataContainerView.prototype, ListViewMixin, {
   _update(options = {}) {
-    var {scrollLeft, scrollTop, xDirection, yDirection} = options;
-    if (_.isUndefined(scrollLeft)) {
-      scrollLeft = this.unitWidth * this.initialXIndex;
+    var {left, top, width, height, xDirection, yDirection} = options;
+    if (_.isUndefined(left)) {
+      left = this.initialXIndex;
     }
-    if (_.isUndefined(scrollTop)) {
-      scrollTop = this.unitHeight * this.initialYIndex;
+    if (_.isUndefined(top)) {
+      top = this.initialYIndex;
     }
-    // Quantize and pad our values
-    var quantizedScrollLeft = quantize(scrollLeft, this.unitWidth);
-    var quantizedScrollTop = quantize(scrollTop, this.unitHeight);
-    var quantizedWidth = quantize(this.dataContainerDimensions.width, this.unitWidth);
-    var quantizedHeight = quantize(this.dataContainerDimensions.height, this.unitHeight);
 
-    var {firstXIndex, lastXIndex} = this._computeXIndices(quantizedScrollLeft, quantizedWidth);
-    var {firstYIndex, lastYIndex} = this._computeYIndices(quantizedScrollTop, quantizedHeight);
+    // Pad the indices
+    var {firstXIndex, lastXIndex} = this._computeXIndices(left, width);
+    var {firstYIndex, lastYIndex} = this._computeYIndices(top, height);
 
     this._managerManager.update({
       firstXIndex,
