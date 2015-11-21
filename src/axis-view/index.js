@@ -52,9 +52,11 @@ _.extend(AxisView.prototype, {
     if (_.isUndefined(scrollOffset)) {
       scrollOffset = this.initialIndex * this.unit;
     }
+
     // Quantize and pad our values
     var quantizedOffset = quantize(scrollOffset, this.unit);
-    var quantizedLength = quantize(this.dataContainerDimensions[this.containerDim], this.unit);
+    var length = this.dataContainerDimensions[this.containerDim];
+    var quantizedLength = quantize(length, this.unit, {cover: true});
     var {firstIndex, lastIndex} = this._getIndices(quantizedOffset, quantizedLength);
     this.nodeListManager.update({
       list: this.list,

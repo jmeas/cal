@@ -180,7 +180,7 @@ describe('AxisView', () => {
         expect(nodeListManager.update).to.have.been.calledWithExactly({
           list,
           firstIndex: 7,
-          lastIndex: 18
+          lastIndex: 19
         });
       });
     });
@@ -192,7 +192,7 @@ describe('AxisView', () => {
         expect(nodeListManager.update).to.have.been.calledWithExactly({
           list,
           firstIndex: 0,
-          lastIndex: 8
+          lastIndex: 9
         });
       });
     });
@@ -204,7 +204,7 @@ describe('AxisView', () => {
         expect(nodeListManager.update).to.have.been.calledWithExactly({
           list,
           firstIndex: 0,
-          lastIndex: 9
+          lastIndex: 10
         });
       });
     });
@@ -216,7 +216,7 @@ describe('AxisView', () => {
         expect(nodeListManager.update).to.have.been.calledWithExactly({
           list,
           firstIndex: 1,
-          lastIndex: 12
+          lastIndex: 13
         });
       });
     });

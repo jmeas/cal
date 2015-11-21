@@ -21,5 +21,6 @@ describe('quantize', () => {
     expect(quantize(9, 2, {cover: true})).to.equal(5);
     expect(quantize(12, 5, {cover: true})).to.equal(3);
     expect(quantize(77, 25, {cover: true})).to.equal(4);
+    expect(quantize(6, 3, {cover: true})).to.equal(2);
   });
 });
