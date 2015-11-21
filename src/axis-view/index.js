@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import quantize from '../common/quantize';
+import ListViewMixin from '../common/list-view-mixin';
 import NodeListManager from './node-list-manager';
 
 function AxisView(options) {
@@ -9,24 +10,7 @@ function AxisView(options) {
   this._createNodeListManager();
 }
 
-_.extend(AxisView.prototype, {
-  // This intelligently renders the view.
-  render(options = {}) {
-    // Clear any existing update we might have in store
-    clearTimeout(this._deferredUpdate);
-
-    // If the user isn't scrolling too fast, then we do a smart update.
-    // Otherwise, we schedule an update for the future, when they might
-    // be scrolling a bit slower.
-    if (!options.speed || options.speed < 6) {
-      this._update(options);
-    } else {
-      this._deferredUpdate = window.setTimeout(() => {
-        this._update(options);
-      }, 50);
-    }
-  },
-
+_.extend(AxisView.prototype, ListViewMixin, {
   // The NodeListManager manages the smart updating of our list.
   _createNodeListManager() {
     this.nodeListManager = new NodeListManager({

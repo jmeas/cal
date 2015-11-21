@@ -2,6 +2,7 @@ import _ from 'lodash';
 import DomPool from 'dom-pool';
 import quantize from '../common/quantize';
 import UtilizationView from '../utilization-view';
+import ListViewMixin from '../common/list-view-mixin';
 import ManagerManager from './manager-manager';
 
 // Assuming 20 people are rendered, with 40  dates,
@@ -20,23 +21,7 @@ function DataContainerView(options) {
   this._createManagers();
 }
 
-_.extend(DataContainerView.prototype, {
-  render(options = {}) {
-    // Clear any existing update we might have in store
-    clearTimeout(this._deferredUpdate);
-
-    // If the user isn't scrolling too fast, then we do a smart update.
-    // Otherwise, we schedule an update for the future, when they might
-    // be scrolling a bit slower.
-    if (!options.speed || options.speed < 6) {
-      this._update(options);
-    } else {
-      this._deferredUpdate = window.setTimeout(() => {
-        this._update(options);
-      }, 50);
-    }
-  },
-
+_.extend(DataContainerView.prototype, ListViewMixin, {
   // Keeps track of whether or not we have a scheduled render. This comes into play
   // when the user is scrolling really fast.
   _deferredUpdate: undefined,
