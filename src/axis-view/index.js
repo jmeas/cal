@@ -46,7 +46,9 @@ _.extend(AxisView.prototype, {
   // Tell the NodeListManager to update the list
   _update(scrollOffset) {
     // If we don't have a scrollOffset, then we use the initial index. This happens
-    // when it's an initial render
+    // when it's an initial render. We assume that the list is always larger than
+    // the initialIndex. For this app, that will be the case (as this feature is only
+    // used on the y axis). Keep in mind that this is not a general solution.
     if (_.isUndefined(scrollOffset)) {
       scrollOffset = this.initialIndex * this.unit;
     }
@@ -66,7 +68,7 @@ _.extend(AxisView.prototype, {
   _getIndices(offset, length) {
     var endOffset = offset + length;
     var startPadding = Math.min(this.padding, offset);
-    var bottomPadding = Math.min(this.padding, this.list.length - endOffset);
+    var bottomPadding = Math.min(this.padding, this.list.length - endOffset - 1);
     var firstIndex = offset - startPadding;
     var lastIndex = endOffset + bottomPadding;
     return {firstIndex, lastIndex};

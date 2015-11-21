@@ -5,10 +5,15 @@ global.chai.use(require('sinon-chai'));
 require('babel-core/register');
 require('./setup')();
 
-/*
-	Uncomment the following if your library uses features of the DOM,
-	for example if writing a jQuery extension, and
-	add 'simple-jsdom' to the `devDependencies` of your package.json
-*/
-// import simpleJSDom from 'simple-jsdom';
-// simpleJSDom.install();
+var jsdom = require('jsdom').jsdom;
+var document = jsdom('<html><head></head><body></body></html>');
+var window = document.defaultView;
+var navigator = window.navigator = {
+  userAgent: 'NodeJS JSDom',
+  appVersion: ''
+};
+
+global.jsdom = jsdom;
+global.window = window;
+global.document = document;
+global.navigator = navigator;
