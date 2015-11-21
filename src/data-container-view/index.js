@@ -17,11 +17,16 @@ function DataContainerView(options) {
   _.extend(this, options);
   this.container = this.el.children[0];
   this._createPool();
-  this._createManagers();
+  this._createManager();
 }
 
 _.extend(DataContainerView.prototype, ListViewMixin, {
   _update(options = {}) {
+    var managerOptions = this._computeManagerOptions(options);
+    this._managerManager.update(managerOptions);
+  },
+
+  _computeManagerOptions(options) {
     var {left, top, width, height, xDirection, yDirection} = options;
     if (_.isUndefined(left)) {
       left = this.initialXIndex;
@@ -34,14 +39,14 @@ _.extend(DataContainerView.prototype, ListViewMixin, {
     var {firstXIndex, lastXIndex} = this._computeXIndices(left, width);
     var {firstYIndex, lastYIndex} = this._computeYIndices(top, height);
 
-    this._managerManager.update({
+    return {
       firstXIndex,
       lastXIndex,
       firstYIndex,
       lastYIndex,
       xDirection,
       yDirection
-    });
+    };
   },
 
   _createPool() {
@@ -51,7 +56,7 @@ _.extend(DataContainerView.prototype, ListViewMixin, {
     this.pool.allocate(DEFAULT_POOL_SIZE);
   },
 
-  _createManagers() {
+  _createManager() {
     this._managerManager = new ManagerManager({
       employees: this.employees,
       el: this.container

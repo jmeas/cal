@@ -1,29 +1,36 @@
 import _ from 'lodash';
 import ListViewMixin from '../common/list-view-mixin';
 import NodeListManager from './node-list-manager';
+import DomPool from 'dom-pool';
 
 function AxisView(options) {
   _.extend(this, options);
   // The container element is where the individual items are rendered into.
   this.container = this.el.children[0];
-  this._createNodeListManager();
+  this._createPool();
+  this._createManager();
 }
 
 _.extend(AxisView.prototype, ListViewMixin, {
   // The NodeListManager manages the smart updating of our list.
-  _createNodeListManager() {
+  _createManager() {
     this.nodeListManager = new NodeListManager({
       unit: this.unit,
       el: this.container,
       dim: this.dimension,
       formatFn: this.formatFn,
       displayProp: this.displayProp,
-      initialPoolSize: this.poolSize
+      pool: this.pool
     });
   },
 
   // Tell the NodeListManager to update the list
   _update(options = {}) {
+    var managerOptions = this._computeManagerOptions(options);
+    this.nodeListManager.update(managerOptions);
+  },
+
+  _computeManagerOptions(options) {
     var {offset, length} = options;
     // If we don't have a scrollOffset, then we use the initial index. This happens
     // when it's an initial render. We assume that the list is always larger than
@@ -35,11 +42,19 @@ _.extend(AxisView.prototype, ListViewMixin, {
 
     // Pad our indices
     var {firstIndex, lastIndex} = this._getIndices(offset, length);
-    this.nodeListManager.update({
+
+    return {
       list: this.list,
       firstIndex,
       lastIndex
+    };
+  },
+
+  _createPool() {
+    this.pool = new DomPool({
+      tagName: 'div'
     });
+    this.pool.allocate(this.poolSize);
   },
 
   // Gets the right indices given an offset (as an index)
