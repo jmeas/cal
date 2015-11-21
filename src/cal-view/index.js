@@ -178,7 +178,7 @@ _.extend(CalView.prototype, {
     this.dataContainerView.render({
       scrollLeft,
       scrollTop,
-      totalSpeed,
+      speed: totalSpeed,
       xDirection,
       yDirection
     });

@@ -11,18 +11,18 @@ function AxisView(options) {
 
 _.extend(AxisView.prototype, {
   // This intelligently renders the view.
-  render({scrollOffset, speed} = {}) {
+  render(options = {}) {
     // Clear any existing update we might have in store
     clearTimeout(this._deferredUpdate);
 
     // If the user isn't scrolling too fast, then we do a smart update.
     // Otherwise, we schedule an update for the future, when they might
     // be scrolling a bit slower.
-    if (!speed || speed < 6) {
-      this._update(scrollOffset);
+    if (!options.speed || options.speed < 6) {
+      this._update(options);
     } else {
       this._deferredUpdate = window.setTimeout(() => {
-        this._update(scrollOffset);
+        this._update(options);
       }, 50);
     }
   },
@@ -44,7 +44,8 @@ _.extend(AxisView.prototype, {
   _deferredUpdate: undefined,
 
   // Tell the NodeListManager to update the list
-  _update(scrollOffset) {
+  _update(options = {}) {
+    var scrollOffset = options.scrollOffset;
     // If we don't have a scrollOffset, then we use the initial index. This happens
     // when it's an initial render. We assume that the list is always larger than
     // the initialIndex. For this app, that will be the case (as this feature is only
