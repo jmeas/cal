@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import quantize from '../common/quantize';
 import ListViewMixin from '../common/list-view-mixin';
 import NodeListManager from './node-list-manager';
 
@@ -25,20 +24,17 @@ _.extend(AxisView.prototype, ListViewMixin, {
 
   // Tell the NodeListManager to update the list
   _update(options = {}) {
-    var scrollOffset = options.scrollOffset;
+    var {offset, length} = options;
     // If we don't have a scrollOffset, then we use the initial index. This happens
     // when it's an initial render. We assume that the list is always larger than
     // the initialIndex. For this app, that will be the case (as this feature is only
     // used on the y axis). Keep in mind that this is not a general solution.
-    if (_.isUndefined(scrollOffset)) {
-      scrollOffset = this.initialIndex * this.unit;
+    if (_.isUndefined(offset)) {
+      offset = this.initialIndex;
     }
 
-    // Quantize and pad our values
-    var quantizedOffset = quantize(scrollOffset, this.unit);
-    var length = this.dataContainerDimensions[this.containerDim];
-    var quantizedLength = quantize(length, this.unit, {cover: true});
-    var {firstIndex, lastIndex} = this._getIndices(quantizedOffset, quantizedLength);
+    // Pad our indices
+    var {firstIndex, lastIndex} = this._getIndices(offset, length);
     this.nodeListManager.update({
       list: this.list,
       firstIndex,

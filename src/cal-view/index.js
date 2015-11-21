@@ -4,6 +4,7 @@ import AxisView from '../axis-view';
 import DataContainerView from '../data-container-view';
 import timelineGenerator from './timeline-generator';
 import dateUtil from '../common/date-util';
+import quantize from '../common/quantize';
 import getElementByHook from '../common/get-element-by-hook';
 
 // The CalView is the parent view of the entire calendar.
@@ -34,14 +35,12 @@ _.extend(CalView.prototype, {
     var offsets = config.timelineOffsets[this.scale];
     this.timeAxisView = new AxisView({
       list: this.timeline,
-      dataContainerDimensions: this.dataContainerDimensions,
       unit: config.yAxisCellHeight,
       poolSize: 80,
       padding: 15,
       initialIndex: offsets.back,
       displayProp: 'time',
       dimension: 'top',
-      containerDim: 'height',
       formatFn(date) {
         return dateUtil.format(date, 'word');
       },
@@ -49,14 +48,12 @@ _.extend(CalView.prototype, {
     });
     this.employeeAxisView = new AxisView({
       list: this.employees,
-      dataContainerDimensions: this.dataContainerDimensions,
       unit: config.xAxisCellWidth,
       poolSize: 50,
       padding: 7,
       initialIndex: 0,
       displayProp: 'name',
       dimension: 'left',
-      containerDim: 'width',
       el: getElementByHook('x-axis')
     });
     this.dataContainerView = new DataContainerView({
@@ -75,8 +72,13 @@ _.extend(CalView.prototype, {
   // more than once; subsequent updates need to be intelligently
   // rendered with `update()`
   render() {
-    this.timeAxisView.render();
-    this.employeeAxisView.render();
+    var {quantizedWidth, quantizedHeight} = this.computeQuantizedLengths();
+    this.timeAxisView.render({
+      length: quantizedHeight
+    });
+    this.employeeAxisView.render({
+      length: quantizedWidth
+    });
     this.dataContainerView.render();
     this.setScroll();
     // This causes an immediate scroll event because it's synchronous
@@ -165,13 +167,20 @@ _.extend(CalView.prototype, {
     xDirection = Math.sign(scrollLeft - this._cachedPositionX);
     yDirection = Math.sign(scrollTop - this._cachedPositionY);
 
+    // The child views don't need the actual dimensions. Instead, they only
+    // need  the quantized values that fit the grid system of the chart.
+    var {quantizedLeft, quantizedTop} = this.computeQuantizedOffsets(scrollLeft, scrollTop);
+    var {quantizedWidth, quantizedHeight} = this.computeQuantizedLengths();
+
     this.timeAxisView.render({
-      scrollOffset: scrollTop,
+      offset: quantizedTop,
+      length: quantizedHeight,
       speed: ySpeed,
       direction: yDirection
     });
     this.employeeAxisView.render({
-      scrollOffset: scrollLeft,
+      offset: quantizedLeft,
+      length: quantizedWidth,
       speed: xSpeed,
       direction: xDirection
     });
@@ -193,6 +202,22 @@ _.extend(CalView.prototype, {
     this._cachedPositionX = scrollLeft;
     this._lastTimestamp = timestamp;
     this._clearScrollDataId = setTimeout(this._clearOldScrollData.bind(this), 30);
+  },
+
+  computeQuantizedOffsets(left, top) {
+    return {
+      quantizedLeft: quantize(left, config.xAxisCellWidth),
+      quantizedTop: quantize(top, config.yAxisCellHeight)
+    };
+  },
+
+  computeQuantizedLengths() {
+    var width = this.dataContainerDimensions.width;
+    var height = this.dataContainerDimensions.height;
+    return {
+      quantizedWidth: quantize(width, config.xAxisCellWidth, {cover: true}),
+      quantizedHeight: quantize(height, config.yAxisCellHeight, {cover: true})
+    };
   },
 
   _handlingMousemove: false,
