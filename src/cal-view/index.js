@@ -197,8 +197,10 @@ _.extend(CalView.prototype, {
 
   _handlingMousemove: false,
 
-  // This allows the user to scroll the data by mousewheeling on the axes.
+  // This allows the user to scroll the data by mousewheeling on the axes areas.
   registerMousemoveEvent() {
+    var topLeftEl = document.querySelector('.top-left');
+    topLeftEl.addEventListener('wheel', this._mousemoveHandler.bind(this));
     this.timeAxisView.el.addEventListener('wheel', this._mousemoveHandler.bind(this));
     this.employeeAxisView.el.addEventListener('wheel', this._mousemoveHandler.bind(this));
   },
