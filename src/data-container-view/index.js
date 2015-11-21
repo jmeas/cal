@@ -22,10 +22,6 @@ function DataContainerView(options) {
 }
 
 _.extend(DataContainerView.prototype, ListViewMixin, {
-  // Keeps track of whether or not we have a scheduled render. This comes into play
-  // when the user is scrolling really fast.
-  _deferredUpdate: undefined,
-
   _update(options = {}) {
     var {scrollLeft, scrollTop, xDirection, yDirection} = options;
     if (_.isUndefined(scrollLeft)) {

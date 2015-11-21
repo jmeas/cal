@@ -23,10 +23,6 @@ _.extend(AxisView.prototype, ListViewMixin, {
     });
   },
 
-  // Keeps track of whether or not we have a scheduled render. This comes into play
-  // when the user is scrolling really fast.
-  _deferredUpdate: undefined,
-
   // Tell the NodeListManager to update the list
   _update(options = {}) {
     var scrollOffset = options.scrollOffset;
