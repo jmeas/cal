@@ -1,7 +1,6 @@
 import _ from 'lodash';
-import DomPool from 'dom-pool';
+import ListView from '../list-view';
 import UtilizationView from '../utilization-view';
-import ListViewMixin from '../common/list-view-mixin';
 import ManagerManager from './manager-manager';
 
 // Assuming 20 people are rendered, with 40  dates,
@@ -14,16 +13,22 @@ const MAX_X_SPEED = 6;
 const MAX_Y_SPEED = 6;
 
 function DataContainerView(options) {
-  _.extend(this, options);
-  this.container = this.el.children[0];
-  this._createPool();
-  this._createManager();
+  ListView.call(this, options);
 }
 
-_.extend(DataContainerView.prototype, ListViewMixin, {
-  _update(options = {}) {
-    var managerOptions = this._computeManagerOptions(options);
-    this._managerManager.update(managerOptions);
+// "Extend" from the ListView
+DataContainerView.prototype = _.create(ListView.prototype, {
+  constructor: DataContainerView
+});
+
+_.extend(DataContainerView.prototype, {
+  poolSize: DEFAULT_POOL_SIZE,
+
+  _createManager() {
+    return new ManagerManager({
+      employees: this.employees,
+      el: this.container
+    });
   },
 
   _computeManagerOptions(options) {
@@ -47,20 +52,6 @@ _.extend(DataContainerView.prototype, ListViewMixin, {
       xDirection,
       yDirection
     };
-  },
-
-  _createPool() {
-    this.pool = new DomPool({
-      tagName: 'div'
-    });
-    this.pool.allocate(DEFAULT_POOL_SIZE);
-  },
-
-  _createManager() {
-    this._managerManager = new ManagerManager({
-      employees: this.employees,
-      el: this.container
-    });
   },
 
   _computeXIndices(offset, length) {

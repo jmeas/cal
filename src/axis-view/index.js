@@ -1,20 +1,20 @@
 import _ from 'lodash';
-import ListViewMixin from '../common/list-view-mixin';
+import ListView from '../list-view';
 import NodeListManager from './node-list-manager';
-import DomPool from 'dom-pool';
 
 function AxisView(options) {
-  _.extend(this, options);
-  // The container element is where the individual items are rendered into.
-  this.container = this.el.children[0];
-  this._createPool();
-  this._createManager();
+  ListView.call(this, options);
 }
 
-_.extend(AxisView.prototype, ListViewMixin, {
+// "Extend" from the ListView
+AxisView.prototype = _.create(ListView.prototype, {
+  constructor: AxisView
+});
+
+_.extend(AxisView.prototype, {
   // The NodeListManager manages the smart updating of our list.
   _createManager() {
-    this.nodeListManager = new NodeListManager({
+    return new NodeListManager({
       unit: this.unit,
       el: this.container,
       dim: this.dimension,
@@ -22,12 +22,6 @@ _.extend(AxisView.prototype, ListViewMixin, {
       displayProp: this.displayProp,
       pool: this.pool
     });
-  },
-
-  // Tell the NodeListManager to update the list
-  _update(options = {}) {
-    var managerOptions = this._computeManagerOptions(options);
-    this.nodeListManager.update(managerOptions);
   },
 
   _computeManagerOptions(options) {
@@ -48,13 +42,6 @@ _.extend(AxisView.prototype, ListViewMixin, {
       firstIndex,
       lastIndex
     };
-  },
-
-  _createPool() {
-    this.pool = new DomPool({
-      tagName: 'div'
-    });
-    this.pool.allocate(this.poolSize);
   },
 
   // Gets the right indices given an offset (as an index)
