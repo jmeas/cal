@@ -11,7 +11,8 @@ describe('AxisView', () => {
       axisView = new AxisView({
         el: document.createElement('div'),
         padding: 3,
-        list: new Array(20)
+        list: new Array(20),
+        _createManager: stub()
       });
     });
 
