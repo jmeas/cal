@@ -18,33 +18,35 @@ describe('AxisView', () => {
 
     describe('when no speed is given', () => {
       it('should update immediately', () => {
-        axisView.render({
-          scrollOffset: 5
-        });
+        var options = {scrollOffset: 5};
+        axisView.render(options);
 
         expect(axisView._update).to.have.been.calledOnce;
-        expect(axisView._update).to.have.been.calledWithExactly(5);
+        expect(axisView._update).to.have.been.calledWithExactly(options);
       });
     });
 
     describe('when a slow speed is given', () => {
       it('should update immediately', () => {
-        axisView.render({
+        var options = {
           scrollOffset: 5,
           speed: 2
-        });
+        };
+        axisView.render(options);
 
         expect(axisView._update).to.have.been.calledOnce;
-        expect(axisView._update).to.have.been.calledWithExactly(5);
+        expect(axisView._update).to.have.been.calledWithExactly(options);
       });
     });
 
     describe('when a fast speed is given', () => {
+      var options;
       beforeEach(() => {
-        axisView.render({
+        options = {
           scrollOffset: 2,
           speed: 100
-        });
+        };
+        axisView.render(options);
       });
 
       it('should not update immediately', () => {
@@ -54,36 +56,28 @@ describe('AxisView', () => {
       it('should update after a few milliseconds', () => {
         clock.tick(50);
         expect(axisView._update).to.have.been.calledOnce;
-        expect(axisView._update).to.have.been.calledWithExactly(2);
+        expect(axisView._update).to.have.been.calledWithExactly(options);
       });
     });
 
     describe('when a fast speed is given repeatedly, with time in-between', () => {
       it('should update after some time between the last call', () => {
-        axisView.render({
+        var options = {
           scrollOffset: 2,
           speed: 100
-        });
+        };
+        axisView.render(options);
         clock.tick(20);
-        axisView.render({
-          scrollOffset: 2,
-          speed: 100
-        });
+        axisView.render(options);
         clock.tick(30);
-        axisView.render({
-          scrollOffset: 2,
-          speed: 100
-        });
+        axisView.render(options);
         clock.tick(30);
-        axisView.render({
-          scrollOffset: 2,
-          speed: 100
-        });
+        axisView.render(options);
         clock.tick(30);
         expect(axisView._update).to.not.have.been.called;
         clock.tick(20);
         expect(axisView._update).to.have.been.calledOnce;
-        expect(axisView._update).to.have.been.calledWithExactly(2);
+        expect(axisView._update).to.have.been.calledWithExactly(options);
       });
     });
   });
@@ -147,35 +141,28 @@ describe('AxisView', () => {
   });
 
   describe('_update', () => {
-    var nodeListManager, dataContainerDimensions, list;
+    var nodeListManager, list;
     // The initial index will be: 8
     beforeEach(() => {
       list = new Array(20);
       axisView = new AxisView({
         el: document.createElement('div'),
         padding: 3,
-        containerDim: 'width',
-        unit: 40,
         initialIndex: 10,
         list
       });
-
-      dataContainerDimensions = {
-        width: 210
-      };
 
       nodeListManager = {
         update: sinon.stub()
       };
 
       axisView.nodeListManager = nodeListManager;
-      axisView.dataContainerDimensions = dataContainerDimensions;
     });
 
     // Only test for initialIndex less than the list length
     describe('when passing no scrollOffset & the initialIndex is within bounds', () => {
       it('should use the default value', () => {
-        axisView._update();
+        axisView._update({length: 6});
         expect(nodeListManager.update).to.have.been.calledOnce;
         expect(nodeListManager.update).to.have.been.calledWithExactly({
           list,
@@ -187,7 +174,10 @@ describe('AxisView', () => {
 
     describe('when passing a scrollOffset of 0', () => {
       it('should call `nodeListManager.update` with the correct arguments', () => {
-        axisView._update(0);
+        axisView._update({
+          offset: 0,
+          length: 6
+        });
         expect(nodeListManager.update).to.have.been.calledOnce;
         expect(nodeListManager.update).to.have.been.calledWithExactly({
           list,
@@ -199,7 +189,10 @@ describe('AxisView', () => {
 
     describe('when passing a scrollOffset of 41', () => {
       it('should call `nodeListManager.update` with the correct arguments', () => {
-        axisView._update(41);
+        axisView._update({
+          offset: 1,
+          length: 6
+        });
         expect(nodeListManager.update).to.have.been.calledOnce;
         expect(nodeListManager.update).to.have.been.calledWithExactly({
           list,
@@ -211,7 +204,10 @@ describe('AxisView', () => {
 
     describe('when passing a scrollOffset of 180', () => {
       it('should call `nodeListManager.update` with the correct arguments', () => {
-        axisView._update(180);
+        axisView._update({
+          offset: 4,
+          length: 6
+        });
         expect(nodeListManager.update).to.have.been.calledOnce;
         expect(nodeListManager.update).to.have.been.calledWithExactly({
           list,
@@ -223,7 +219,10 @@ describe('AxisView', () => {
 
     describe('when passing a scrollOffset of 700', () => {
       it('should call `nodeListManager.update` with the correct arguments', () => {
-        axisView._update(700);
+        axisView._update({
+          offset: 17,
+          length: 6
+        });
         expect(nodeListManager.update).to.have.been.calledOnce;
         expect(nodeListManager.update).to.have.been.calledWithExactly({
           list,
