@@ -76,13 +76,6 @@ _.extend(NodeListManager.prototype, {
   _firstIndex: undefined,
   _lastIndex: undefined,
 
-  _createPool(size) {
-    this.pool = new DomPool({
-      tagName: 'div'
-    });
-    this.pool.allocate(this.initialPoolSize);
-  },
-
   // Ensure that the element is empty
   _clear() {
     while (this.el.firstChild) {
