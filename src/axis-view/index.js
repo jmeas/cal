@@ -25,7 +25,7 @@ _.extend(AxisView.prototype, {
   },
 
   _computeManagerOptions(options) {
-    var {offset, length} = options;
+    var {offset, length, direction} = options;
     // If we don't have a scrollOffset, then we use the initial index. This happens
     // when it's an initial render. We assume that the list is always larger than
     // the initialIndex. For this app, that will be the case (as this feature is only
@@ -46,7 +46,8 @@ _.extend(AxisView.prototype, {
     return {
       list: this.list,
       firstIndex,
-      lastIndex
+      lastIndex,
+      direction
     };
   }
 });

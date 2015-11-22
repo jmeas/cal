@@ -42,7 +42,7 @@ _.extend(NodeListManager.prototype, {
   // Updating is a two-part process: removing nodes that have
   // moved too far away, and then adding new nodes that are moving
   // into view
-  update({firstIndex, lastIndex, list}) {
+  update({firstIndex, lastIndex, list, direction}) {
     // Nothing to update if the indices are unchanged
     if (firstIndex === this._firstIndex && lastIndex === this._lastIndex) {
       return;
@@ -52,20 +52,12 @@ _.extend(NodeListManager.prototype, {
       return this.initialRender({firstIndex, lastIndex, list});
     }
 
-    // Determine whether we're going forward or back.
-    var directionSign;
-    if (this._firstIndex !== 0) {
-      directionSign = firstIndex < this._firstIndex ? -1 : 1;
-    } else {
-      directionSign = lastIndex < this._lastIndex ? -1 : 1;
-    }
-
     var totalSize = lastIndex - firstIndex + 1;
     var backwardDelta = Math.abs(this._firstIndex - firstIndex);
     var forwardDelta = Math.abs(this._lastIndex - lastIndex);
 
-    var removeDelta = directionSign > 0 ? backwardDelta : forwardDelta;
-    var addDelta = directionSign > 0 ? forwardDelta : backwardDelta;
+    var removeDelta = direction > 0 ? backwardDelta : forwardDelta;
+    var addDelta = direction > 0 ? forwardDelta : backwardDelta;
 
     // If the change is larger than the current size of the list, then we're
     // effectively redrawing it
@@ -75,8 +67,8 @@ _.extend(NodeListManager.prototype, {
 
     // Otherwise, we do an intelligent update by adding and removing nodes
     else {
-      this._removeNodes({directionSign, removeDelta});
-      this._addNodes({directionSign, list, addDelta});
+      this._removeNodes({direction, removeDelta});
+      this._addNodes({direction, list, addDelta});
       this._firstIndex = firstIndex;
       this._lastIndex = lastIndex;
     }
@@ -100,7 +92,7 @@ _.extend(NodeListManager.prototype, {
     }
   },
 
-  _removeNodes({directionSign, removeDelta}) {
+  _removeNodes({direction, removeDelta}) {
     // If we have no nodes, then there's nothing to remove!
     if (!this.el.children.length) { return; }
 
@@ -109,7 +101,7 @@ _.extend(NodeListManager.prototype, {
     _.times(removeDelta, () => {
       // We either remove from the start or end of the list, depending
       // on the direction of scrolling
-      nodePosition = directionSign > 0 ? 'firstChild' : 'lastChild';
+      nodePosition = direction > 0 ? 'firstChild' : 'lastChild';
       targetNode = this.el[nodePosition];
       // If the node exists, then we remove it and push back the element into the pool
       if (targetNode) {
@@ -118,19 +110,19 @@ _.extend(NodeListManager.prototype, {
     });
   },
 
-  _addNodes({directionSign, list, addDelta}) {
+  _addNodes({direction, list, addDelta}) {
     // Anchor ourselves based on the direction that we're moving toward
-    var anchor = directionSign > 0 ? this._lastIndex : this._firstIndex;
+    var anchor = direction > 0 ? this._lastIndex : this._firstIndex;
 
     var fragment = document.createDocumentFragment();
     var el, formattedText, val, absoluteIndex;
     _.times(addDelta, n => {
       // When we're prepending the nodes, we need to add them in reverse order
-      if (directionSign < 0) {
+      if (direction < 0) {
         n = addDelta - n;
       }
 
-      absoluteIndex = anchor + (n * directionSign);
+      absoluteIndex = anchor + (n * direction);
 
       // Get our value from the list, based on index,
       // then format it according to the format fn
@@ -143,7 +135,7 @@ _.extend(NodeListManager.prototype, {
     });
     // Although the order of the nodes doesn't matter, it's not much
     // work to keep them in order, so we do!
-    if (directionSign > 0) {
+    if (direction > 0) {
       this.el.appendChild(fragment);
     } else {
       this.el.insertBefore(fragment, this.el.firstChild);

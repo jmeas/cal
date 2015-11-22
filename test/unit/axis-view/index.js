@@ -27,7 +27,8 @@ describe('AxisView', () => {
         expect(result).to.deep.equal({
           list,
           firstIndex: 7,
-          lastIndex: 19
+          lastIndex: 19,
+          direction: undefined
         });
       });
     });
@@ -36,12 +37,14 @@ describe('AxisView', () => {
       it('should compute the correct options', () => {
         var result = axisView._computeManagerOptions({
           offset: 0,
-          length: 6
+          length: 6,
+          direction: 1
         });
         expect(result).to.deep.equal({
           list,
           firstIndex: 0,
-          lastIndex: 9
+          lastIndex: 9,
+          direction: 1
         });
       });
     });
@@ -50,12 +53,14 @@ describe('AxisView', () => {
       it('should compute the correct options', () => {
         var result = axisView._computeManagerOptions({
           offset: 1,
-          length: 6
+          length: 6,
+          direction: -1
         });
         expect(result).to.deep.equal({
           list,
           firstIndex: 0,
-          lastIndex: 10
+          lastIndex: 10,
+          direction: -1
         });
       });
     });
@@ -64,12 +69,14 @@ describe('AxisView', () => {
       it('should compute the correct options', () => {
         var result = axisView._computeManagerOptions({
           offset: 4,
-          length: 6
+          length: 6,
+          direction: 1
         });
         expect(result).to.deep.equal({
           list,
           firstIndex: 1,
-          lastIndex: 13
+          lastIndex: 13,
+          direction: 1
         });
       });
     });
@@ -78,12 +85,14 @@ describe('AxisView', () => {
       it('should compute the correct options', () => {
         var result = axisView._computeManagerOptions({
           offset: 17,
-          length: 6
+          length: 6,
+          direction: -1
         });
         expect(result).to.deep.equal({
           list,
           firstIndex: 14,
-          lastIndex: 19
+          lastIndex: 19,
+          direction: -1
         });
       });
     });
