@@ -82,4 +82,97 @@ describe('ListView', () => {
       });
     });
   });
+
+  describe('_computeIndices', () => {
+    beforeEach(() => {
+      listView = new ListView({
+        el: document.createElement('div'),
+        _createManager: stub()
+      });
+    });
+
+    describe('when calling from well within the ends of the list', () => {
+      it('should return the correct indices', () => {
+        var result = listView._computeIndices({
+          offset: 10,
+          length: 3,
+          min: 0,
+          max: 19,
+          padding: 3
+        });
+        expect(result.firstIndex).to.equal(7);
+        expect(result.lastIndex).to.equal(16);
+      });
+    });
+
+    describe('when calling near the start', () => {
+      it('should return the correct indices', () => {
+        var result = listView._computeIndices({
+          offset: 2,
+          length: 3,
+          min: 0,
+          max: 19,
+          padding: 3
+        });
+        expect(result.firstIndex).to.equal(0);
+        expect(result.lastIndex).to.equal(8);
+      });
+    });
+
+    describe('when calling at the start', () => {
+      it('should return the correct indices', () => {
+        var result = listView._computeIndices({
+          offset: 0,
+          length: 3,
+          min: 0,
+          max: 19,
+          padding: 3
+        });
+        expect(result.firstIndex).to.equal(0);
+        expect(result.lastIndex).to.equal(6);
+      });
+    });
+
+    describe('when calling near the end', () => {
+      it('should return the correct indices', () => {
+        var result = listView._computeIndices({
+          offset: 18,
+          length: 3,
+          min: 0,
+          max: 19,
+          padding: 3
+        });
+        expect(result.firstIndex).to.equal(15);
+        expect(result.lastIndex).to.equal(19);
+      });
+    });
+
+    describe('when calling at the end', () => {
+      it('should return the correct indices', () => {
+        var result = listView._computeIndices({
+          offset: 19,
+          length: 3,
+          min: 0,
+          max: 19,
+          padding: 3
+        });
+        expect(result.firstIndex).to.equal(16);
+        expect(result.lastIndex).to.equal(19);
+      });
+    });
+
+    describe('with an offset of 0', () => {
+      it('should return the correct indices', () => {
+        var result = listView._computeIndices({
+          offset: 15,
+          length: 0,
+          min: 0,
+          max: 19,
+          padding: 3
+        });
+        expect(result.firstIndex).to.equal(12);
+        expect(result.lastIndex).to.equal(18);
+      });
+    });
+  });
 });
