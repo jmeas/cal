@@ -2,14 +2,11 @@ import _ from 'lodash';
 
 // This thing creates our "chunks," which are a slice of a long list of nodes. It uses
 // DOM pooling to prevent garbage collection while the user scrolls. Tl;dr: it's dope.
-function NodeListManager({el, displayProp, formatFn, unit, dim, pool, list}) {
-  this.el = el;
-  this.displayProp = displayProp;
-  this.formatFn = formatFn || _.identity;
-  this.dim = dim;
-  this.unit = unit;
-  this.pool = pool;
-  this.list = list;
+function NodeListManager(options = {}) {
+  _.defaults(options, {
+    formatFn: _.identity
+  });
+  _.extend(this, options);
 }
 
 _.extend(NodeListManager.prototype, {
