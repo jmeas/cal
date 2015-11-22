@@ -17,7 +17,7 @@ _.extend(NodeListManager.prototype, {
     }
     var totalToAdd = lastIndex - firstIndex + 1;
     var fragment = document.createDocumentFragment();
-    var el, val, formattedText;
+    var el, val, formattedText, absoluteIndex;
     _.times(totalToAdd, n => {
       absoluteIndex = firstIndex + n;
 
