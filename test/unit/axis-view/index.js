@@ -46,7 +46,7 @@ describe('AxisView', () => {
       });
     });
 
-    describe('when passing a scrollOffset of 41', () => {
+    describe('when passing an offset of 1', () => {
       it('should compute the correct options', () => {
         var result = axisView._computeManagerOptions({
           offset: 1,
@@ -60,7 +60,7 @@ describe('AxisView', () => {
       });
     });
 
-    describe('when passing a scrollOffset of 180', () => {
+    describe('when passing an ofset of 4', () => {
       it('should compute the correct options', () => {
         var result = axisView._computeManagerOptions({
           offset: 4,
@@ -74,7 +74,7 @@ describe('AxisView', () => {
       });
     });
 
-    describe('when passing a scrollOffset of 700', () => {
+    describe('when passing an offset of 17', () => {
       it('should compute the correct options', () => {
         var result = axisView._computeManagerOptions({
           offset: 17,
