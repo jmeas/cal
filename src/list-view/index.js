@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import DomPool from 'dom-pool';
+import clamp from '../common/clamp';
 
 function ListView(options) {
   _.extend(this, options);
@@ -41,6 +42,15 @@ _.extend(ListView.prototype, {
       tagName: 'div'
     });
     this.pool.allocate(this.poolSize);
+  },
+
+  _computeIndices({offset, length, min, max, padding}) {
+    var endOffset = offset + length;
+
+    return {
+      firstIndex: clamp(offset - padding, min, max),
+      lastIndex: clamp(endOffset + padding, min, max)
+    };
   }
 });
 

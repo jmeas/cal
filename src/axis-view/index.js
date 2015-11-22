@@ -35,24 +35,19 @@ _.extend(AxisView.prototype, {
     }
 
     // Pad our indices
-    var {firstIndex, lastIndex} = this._getIndices(offset, length);
+    var {firstIndex, lastIndex} = this._computeIndices({
+      offset,
+      length,
+      min: 0,
+      max: this.list.length - 1,
+      padding: this.padding
+    });
 
     return {
       list: this.list,
       firstIndex,
       lastIndex
     };
-  },
-
-  // Gets the right indices given an offset (as an index)
-  // and a length (in units of indices)
-  _getIndices(offset, length) {
-    var endOffset = offset + length;
-    var startPadding = Math.min(this.padding, offset);
-    var bottomPadding = Math.min(this.padding, this.list.length - endOffset - 1);
-    var firstIndex = offset - startPadding;
-    var lastIndex = endOffset + bottomPadding;
-    return {firstIndex, lastIndex};
   }
 });
 

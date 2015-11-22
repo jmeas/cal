@@ -41,36 +41,31 @@ _.extend(DataContainerView.prototype, {
     }
 
     // Pad the indices
-    var {firstXIndex, lastXIndex} = this._computeXIndices(left, width);
-    var {firstYIndex, lastYIndex} = this._computeYIndices(top, height);
+    var xIndices = this._computeIndices({
+      offset: left,
+      length: width,
+      min: 0,
+      max: this.employees.length - 1,
+      padding: X_PADDING
+    });
+
+    var yIndices = this._computeIndices({
+      offset: top,
+      length: height,
+      min: 0,
+      max: this.timeline.length - 1,
+      padding: Y_PADDING
+    });
 
     return {
-      firstXIndex,
-      lastXIndex,
-      firstYIndex,
-      lastYIndex,
+      firstXIndex: xIndices.firstIndex,
+      lastXIndex: xIndices.lastIndex,
+      firstYIndex: yIndices.firstIndex,
+      lastYIndex: yIndices.lastIndex,
       xDirection,
       yDirection
     };
-  },
-
-  _computeXIndices(offset, length) {
-    var endOffset = offset + length;
-    var startPadding = Math.min(X_PADDING, offset);
-    var bottomPadding = Math.min(X_PADDING, this.employees.length - endOffset - 1);
-    var firstXIndex = offset - startPadding;
-    var lastXIndex = endOffset + bottomPadding;
-    return {firstXIndex, lastXIndex};
-  },
-
-  _computeYIndices(offset, length) {
-    var endOffset = offset + length;
-    var startPadding = Math.min(Y_PADDING, offset);
-    var bottomPadding = Math.min(Y_PADDING, this.timeline.length - endOffset - 1);
-    var firstYIndex = offset - startPadding;
-    var lastYIndex = endOffset + bottomPadding;
-    return {firstYIndex, lastYIndex};
-  },
+  }
 });
 
 export default DataContainerView;
