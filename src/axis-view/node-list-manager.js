@@ -2,18 +2,19 @@ import _ from 'lodash';
 
 // This thing creates our "chunks," which are a slice of a long list of nodes. It uses
 // DOM pooling to prevent garbage collection while the user scrolls. Tl;dr: it's dope.
-function NodeListManager({el, displayProp, formatFn, unit, dim, pool}) {
+function NodeListManager({el, displayProp, formatFn, unit, dim, pool, list}) {
   this.el = el;
   this.displayProp = displayProp;
   this.formatFn = formatFn || _.identity;
   this.dim = dim;
   this.unit = unit;
   this.pool = pool;
+  this.list = list;
 }
 
 _.extend(NodeListManager.prototype, {
   // Populates the axis with the initial batch of elements
-  initialRender({firstIndex, lastIndex, list}) {
+  initialRender({firstIndex, lastIndex}) {
     if (this.el.children.length) {
       this._clear();
     }
@@ -25,7 +26,7 @@ _.extend(NodeListManager.prototype, {
 
       // Get our value from the list, based on index,
       // then format it according to the format fn
-      val = list[absoluteIndex][this.displayProp];
+      val = this.list[absoluteIndex][this.displayProp];
       formattedText = this.formatFn(val);
 
       // Pop a node from the pool, then update its properties
@@ -42,14 +43,14 @@ _.extend(NodeListManager.prototype, {
   // Updating is a two-part process: removing nodes that have
   // moved too far away, and then adding new nodes that are moving
   // into view
-  update({firstIndex, lastIndex, list, direction}) {
+  update({firstIndex, lastIndex, direction}) {
     // Nothing to update if the indices are unchanged
     if (firstIndex === this._firstIndex && lastIndex === this._lastIndex) {
       return;
     }
     // If this manager has no indices, then it must be the first render.
     else if (_.isUndefined(this._firstIndex) || _.isUndefined(this._lastIndex)) {
-      return this.initialRender({firstIndex, lastIndex, list});
+      return this.initialRender({firstIndex, lastIndex});
     }
 
     var totalSize = lastIndex - firstIndex + 1;
@@ -62,13 +63,13 @@ _.extend(NodeListManager.prototype, {
     // If the change is larger than the current size of the list, then we're
     // effectively redrawing it
     if (backwardDelta >= totalSize) {
-      this.initialRender({firstIndex, lastIndex, list});
+      this.initialRender({firstIndex, lastIndex});
     }
 
     // Otherwise, we do an intelligent update by adding and removing nodes
     else {
       this._removeNodes({direction, removeDelta});
-      this._addNodes({direction, list, addDelta});
+      this._addNodes({direction, addDelta});
       this._firstIndex = firstIndex;
       this._lastIndex = lastIndex;
     }
@@ -110,7 +111,7 @@ _.extend(NodeListManager.prototype, {
     });
   },
 
-  _addNodes({direction, list, addDelta}) {
+  _addNodes({direction, addDelta}) {
     // Anchor ourselves based on the direction that we're moving toward
     var anchor = direction > 0 ? this._lastIndex : this._firstIndex;
 
@@ -126,7 +127,7 @@ _.extend(NodeListManager.prototype, {
 
       // Get our value from the list, based on index,
       // then format it according to the format fn
-      val = list[absoluteIndex][this.displayProp];
+      val = this.list[absoluteIndex][this.displayProp];
       formattedText = this.formatFn(val);
       el = this.pool.pop();
       el.textContent = formattedText;

@@ -20,7 +20,8 @@ _.extend(AxisView.prototype, {
       dim: this.dimension,
       formatFn: this.formatFn,
       displayProp: this.displayProp,
-      pool: this.pool
+      pool: this.pool,
+      list: this.list
     });
   },
 
@@ -44,7 +45,6 @@ _.extend(AxisView.prototype, {
     });
 
     return {
-      list: this.list,
       firstIndex,
       lastIndex,
       direction

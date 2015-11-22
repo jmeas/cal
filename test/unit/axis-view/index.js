@@ -25,7 +25,6 @@ describe('AxisView', () => {
       it('should use the default value', () => {
         var result = axisView._computeManagerOptions({length: 6});
         expect(result).to.deep.equal({
-          list,
           firstIndex: 7,
           lastIndex: 19,
           direction: undefined
@@ -41,7 +40,6 @@ describe('AxisView', () => {
           direction: 1
         });
         expect(result).to.deep.equal({
-          list,
           firstIndex: 0,
           lastIndex: 9,
           direction: 1
@@ -57,7 +55,6 @@ describe('AxisView', () => {
           direction: -1
         });
         expect(result).to.deep.equal({
-          list,
           firstIndex: 0,
           lastIndex: 10,
           direction: -1
@@ -73,7 +70,6 @@ describe('AxisView', () => {
           direction: 1
         });
         expect(result).to.deep.equal({
-          list,
           firstIndex: 1,
           lastIndex: 13,
           direction: 1
@@ -89,7 +85,6 @@ describe('AxisView', () => {
           direction: -1
         });
         expect(result).to.deep.equal({
-          list,
           firstIndex: 14,
           lastIndex: 19,
           direction: -1
