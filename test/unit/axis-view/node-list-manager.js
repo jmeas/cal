@@ -175,6 +175,14 @@ describe('NodeListManager', () => {
           addDelta: 1
         });
       });
+
+      it('should call `_removeNodes` with the correct arguments', () => {
+        expect(nodeListManager._removeNodes).to.have.been.calledOnce;
+        expect(nodeListManager._removeNodes).to.have.been.calledWithExactly({
+          direction: 1,
+          removeDelta: 1
+        });
+      });
     });
 
     describe('when the difference is adding the last element of the list', () => {
@@ -194,6 +202,14 @@ describe('NodeListManager', () => {
         expect(nodeListManager._addNodes).to.have.been.calledWithExactly({
           direction: 1,
           addDelta: 1
+        });
+      });
+
+      it('should call `_removeNodes` with the correct arguments', () => {
+        expect(nodeListManager._removeNodes).to.have.been.calledOnce;
+        expect(nodeListManager._removeNodes).to.have.been.calledWithExactly({
+          direction: 1,
+          removeDelta: 1
         });
       });
     });
@@ -217,6 +233,14 @@ describe('NodeListManager', () => {
           addDelta: 1
         });
       });
+
+      it('should call `_removeNodes` with the correct arguments', () => {
+        expect(nodeListManager._removeNodes).have.been.calledOnce;
+        expect(nodeListManager._removeNodes).to.have.been.calledWithExactly({
+          direction: -1,
+          removeDelta: 1
+        });
+      });
     });
 
     describe('when the difference is adding a few nodes', () => {
@@ -236,6 +260,103 @@ describe('NodeListManager', () => {
         expect(nodeListManager._addNodes).to.have.been.calledWithExactly({
           direction: 1,
           addDelta: 5
+        });
+      });
+
+      it('should call `_removeNodes` with the correct arguments', () => {
+        expect(nodeListManager._removeNodes).have.been.calledOnce;
+        expect(nodeListManager._removeNodes).to.have.been.calledWithExactly({
+          direction: 1,
+          removeDelta: 5
+        });
+      });
+    });
+
+    describe('when the indices do not change at the same rate, positive', () => {
+      describe('no change back, 1 change forward', () => {
+        beforeEach(() => {
+          nodeListManager._firstIndex = 5;
+          nodeListManager._lastIndex = 10;
+
+          nodeListManager.update({
+            firstIndex: 5,
+            lastIndex: 11,
+            direction: 1
+          });
+        });
+
+        it('should call `_addNodes` with the correct arguments', () => {
+          expect(nodeListManager._addNodes).have.been.calledOnce;
+          expect(nodeListManager._addNodes).to.have.been.calledWithExactly({
+            direction: 1,
+            addDelta: 1
+          });
+        });
+
+        it('should call `_removeNodes` with the correct arguments', () => {
+          expect(nodeListManager._removeNodes).have.been.calledOnce;
+          expect(nodeListManager._removeNodes).to.have.been.calledWithExactly({
+            direction: 1,
+            removeDelta: 0
+          });
+        });
+      });
+
+      describe('no change forward, 1 change forward at end', () => {
+        beforeEach(() => {
+          nodeListManager._firstIndex = 5;
+          nodeListManager._lastIndex = 10;
+
+          nodeListManager.update({
+            firstIndex: 6,
+            lastIndex: 10,
+            direction: 1
+          });
+        });
+
+        it('should call `_addNodes` with the correct arguments', () => {
+          expect(nodeListManager._addNodes).have.been.calledOnce;
+          expect(nodeListManager._addNodes).to.have.been.calledWithExactly({
+            direction: 1,
+            addDelta: 0
+          });
+        });
+
+        it('should call `_removeNodes` with the correct arguments', () => {
+          expect(nodeListManager._removeNodes).have.been.calledOnce;
+          expect(nodeListManager._removeNodes).to.have.been.calledWithExactly({
+            direction: 1,
+            removeDelta: 1
+          });
+        });
+      });
+
+      describe('5 changes at end, 0 change forward at start', () => {
+        beforeEach(() => {
+          nodeListManager._firstIndex = 5;
+          nodeListManager._lastIndex = 10;
+
+          nodeListManager.update({
+            firstIndex: 5,
+            lastIndex: 15,
+            direction: 1
+          });
+        });
+
+        it('should call `_addNodes` with the correct arguments', () => {
+          expect(nodeListManager._addNodes).have.been.calledOnce;
+          expect(nodeListManager._addNodes).to.have.been.calledWithExactly({
+            direction: 1,
+            addDelta: 5
+          });
+        });
+
+        it('should call `_removeNodes` with the correct arguments', () => {
+          expect(nodeListManager._removeNodes).have.been.calledOnce;
+          expect(nodeListManager._removeNodes).to.have.been.calledWithExactly({
+            direction: 1,
+            removeDelta: 0
+          });
         });
       });
     });

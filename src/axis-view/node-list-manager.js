@@ -50,26 +50,17 @@ _.extend(NodeListManager.prototype, {
       return this.initialRender({firstIndex, lastIndex});
     }
 
-    var totalSize = lastIndex - firstIndex + 1;
     var backwardDelta = Math.abs(this._firstIndex - firstIndex);
     var forwardDelta = Math.abs(this._lastIndex - lastIndex);
 
     var removeDelta = direction > 0 ? backwardDelta : forwardDelta;
     var addDelta = direction > 0 ? forwardDelta : backwardDelta;
 
-    // If the change is larger than the current size of the list, then we're
-    // effectively redrawing it
-    if (backwardDelta >= totalSize) {
-      this.initialRender({firstIndex, lastIndex});
-    }
-
     // Otherwise, we do an intelligent update by adding and removing nodes
-    else {
-      this._removeNodes({direction, removeDelta});
-      this._addNodes({direction, addDelta});
-      this._firstIndex = firstIndex;
-      this._lastIndex = lastIndex;
-    }
+    this._removeNodes({direction, removeDelta});
+    this._addNodes({direction, addDelta});
+    this._firstIndex = firstIndex;
+    this._lastIndex = lastIndex;
   },
 
   // These indices keep track of where we begin and end
