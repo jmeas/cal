@@ -26,7 +26,7 @@ describe('NodeListManager', () => {
     describe('when there are no children elements', () => {
       it('should not push anything to the pool', () => {
         nodeListManager._clear();
-        expect(pool.push).to.not.have.beenCalled;
+        expect(pool.push).to.not.have.been.called;
       });
     });
 
@@ -75,7 +75,7 @@ describe('NodeListManager', () => {
           lastIndex: 10
         });
 
-        expect(nodeListManager._clear).to.not.have.beenCalled;
+        expect(nodeListManager._clear).to.not.have.been.called;
       });
     });
 
@@ -357,6 +357,149 @@ describe('NodeListManager', () => {
             direction: 1,
             removeDelta: 0
           });
+        });
+      });
+    });
+  });
+
+  describe('_removeNodes', () => {
+    beforeEach(() => {
+      nodeListManager = new NodeListManager({
+        el: document.createElement('div'),
+        pool: pool,
+        displayProp: 'name',
+        list: Array(20).fill({
+          name: 'sandwich'
+        })
+      });
+    });
+
+    describe('when there are no children', () => {
+      it('should not call pool.push', () => {
+        nodeListManager._removeNodes({
+          direction: 1,
+          removeDelta: 10
+        });
+
+        expect(pool.push).to.not.have.been.called;
+      });
+    });
+
+    describe('when there are children', () => {
+      var elOne, elTwo, elThree;
+      beforeEach(() => {
+        elOne = document.createElement('div');
+        elTwo = document.createElement('div');
+        elThree = document.createElement('div');
+        nodeListManager.el.appendChild(elOne);
+        nodeListManager.el.appendChild(elTwo);
+        nodeListManager.el.appendChild(elThree);
+      });
+
+      describe('and there is nothing to remove', () => {
+        it('should not call pool.push', () => {
+          nodeListManager._removeNodes({
+            direction: 1,
+            removeDelta: 0
+          });
+
+          expect(pool.push).to.not.have.been.called;
+        });
+      });
+
+      describe('positive direction', () => {
+        beforeEach(() => {
+          nodeListManager._removeNodes({
+            direction: 1,
+            removeDelta: 2
+          });
+        });
+
+        it('should remove the nodes, leaving the right ones', () => {
+          expect(nodeListManager.el.children).to.have.length(1);
+          expect(nodeListManager.el.children[0]).to.equal(elThree);
+        });
+
+        it('should push them into the pool', () => {
+          expect(pool.push).to.have.been.calledTwice;
+          expect(pool.push).to.have.been.calledWithExactly(elOne);
+          expect(pool.push).to.have.been.calledWithExactly(elTwo);
+        });
+      });
+
+      describe('negative direction', () => {
+        beforeEach(() => {
+          nodeListManager._removeNodes({
+            direction: -1,
+            removeDelta: 2
+          });
+        });
+
+        it('should remove the nodes, leaving the right ones', () => {
+          expect(nodeListManager.el.children).to.have.length(1);
+          expect(nodeListManager.el.children[0]).to.equal(elOne);
+        });
+
+        it('should push them into the pool', () => {
+          expect(pool.push).to.have.been.calledTwice;
+          expect(pool.push).to.have.been.calledWithExactly(elTwo);
+          expect(pool.push).to.have.been.calledWithExactly(elThree);
+        });
+      });
+    });
+  });
+
+  describe('_addNodes', () => {
+    beforeEach(() => {
+      nodeListManager = new NodeListManager({
+        el: document.createElement('div'),
+        pool: pool,
+        displayProp: 'name',
+        list: Array(20).fill({
+          name: 'sandwich'
+        })
+      });
+    });
+
+    describe('when there is nothing to add', () => {
+      it('should not add anything', () => {
+        nodeListManager._addNodes({
+          direction: 1,
+          addDelta: 0
+        });
+
+        expect(nodeListManager.el.children).to.have.length(0);
+      });
+    });
+
+    describe('forward', () => {
+      describe('when in the middle of the list, adding 5', () => {
+        beforeEach(() => {
+          nodeListManager._firstIndex = 5;
+          nodeListManager._lastIndex = 10;
+          nodeListManager._addNodes({
+            direction: 1,
+            addDelta: 5
+          });
+        });
+
+        it('should add 5 new items', () => {
+          expect(nodeListManager.el.children).to.have.length(5);
+        });
+      });
+
+      describe('when near the end of the list, adding 1', () => {
+        beforeEach(() => {
+          nodeListManager._firstIndex = 5;
+          nodeListManager._lastIndex = 18;
+          nodeListManager._addNodes({
+            direction: 1,
+            addDelta: 1
+          });
+        });
+
+        it('should add 1 new item', () => {
+          expect(nodeListManager.el.children).to.have.length(1);
         });
       });
     });

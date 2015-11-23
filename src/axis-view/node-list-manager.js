@@ -93,6 +93,9 @@ _.extend(NodeListManager.prototype, {
   },
 
   _addNodes({direction, addDelta}) {
+    // If there's nothing to add, then bail
+    if (!addDelta) { return; }
+
     // Anchor ourselves based on the direction that we're moving toward
     var anchor = direction > 0 ? this._lastIndex : this._firstIndex;
 
@@ -102,6 +105,12 @@ _.extend(NodeListManager.prototype, {
       // When we're prepending the nodes, we need to add them in reverse order
       if (direction < 0) {
         n = addDelta - n;
+      }
+      // If we're adding the nodes, then we need to add one to make the
+      // algorithm work. Gotta figure out why this is, and refactor
+      // the code to be a little less ad hoc.
+      else {
+        n++;
       }
 
       absoluteIndex = anchor + (n * direction);
