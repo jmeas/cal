@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import NodeListManager from '../../../src/axis-view/node-list-manager';
 
 describe('NodeListManager', () => {
@@ -50,6 +51,10 @@ describe('NodeListManager', () => {
         expect(pool.push).to.have.been.calledWithExactly(elOne);
         expect(pool.push).to.have.been.calledWithExactly(elTwo);
         expect(pool.push).to.have.been.calledWithExactly(elThree);
+      });
+
+      it('should remove all elements from the el', () => {
+        expect(nodeListManager.el.children).to.have.length(0);
       });
     });
   });
@@ -458,6 +463,82 @@ describe('NodeListManager', () => {
         it('should add 1 new item', () => {
           expect(nodeListManager.el.children).to.have.length(1);
         });
+      });
+    });
+  });
+
+  describe('_createElementByIndex', () => {
+    beforeEach(() => {
+      var list = _.map(Array(20), (v, i) => {
+        return {
+          name: i
+        };
+      });
+
+      nodeListManager = new NodeListManager({
+        el: document.createElement('div'),
+        pool: pool,
+        displayProp: 'name',
+        unit: 10,
+        dim: 'left',
+        list: list
+      });
+    });
+
+    describe('the first index: 0', () => {
+      var result;
+      beforeEach(() => {
+        result = nodeListManager._createElementByIndex(0);
+      });
+
+      it('should return an Element', () => {
+        expect(result).to.be.instanceof(window.Element);
+      });
+
+      it('should have the proper text', () => {
+        expect(result.textContent).to.equal('0');
+      });
+
+      it('should have the right style', () => {
+        expect(result.style.left).to.equal('0px');
+      });
+    });
+
+    describe('the last index: 19', () => {
+      var result;
+      beforeEach(() => {
+        result = nodeListManager._createElementByIndex(19);
+      });
+
+      it('should return an Element', () => {
+        expect(result).to.be.instanceof(window.Element);
+      });
+
+      it('should have the proper text', () => {
+        expect(result.textContent).to.equal('19');
+      });
+
+      it('should have the right style', () => {
+        expect(result.style.left).to.equal('190px');
+      });
+    });
+
+    describe('an in-between index: 19', () => {
+      var result;
+      beforeEach(() => {
+        result = nodeListManager._createElementByIndex(9);
+      });
+
+      it('should return an Element', () => {
+        expect(result).to.be.instanceof(window.Element);
+      });
+
+      it('should have the proper text', () => {
+        expect(result.textContent).to.equal('9');
+      });
+
+      it('should have the right style', () => {
+        expect(result.style.left).to.equal('90px');
       });
     });
   });

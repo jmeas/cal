@@ -36,8 +36,19 @@ _.extend(NodeListManager.prototype, {
       addDelta = direction > 0 ? forwardDelta : backwardDelta;
       referenceIndex = direction > 0 ? this._lastIndex : this._firstIndex;
 
-      // We only need to remove nodes when it's not the initial render
-      this._removeNodes({direction, removeDelta});
+      var currentSize = this._lastIndex - this._firstIndex + 1;
+      if (removeDelta > currentSize) {
+        initialRender = true;
+        referenceIndex = firstIndex - 1;
+        direction = 1;
+        addDelta = lastIndex - firstIndex + 1;
+      }
+
+      // We only need to remove nodes when it's not the initial render, and
+      // if the size of the removal is less than the total number of elements.
+      else {
+        this._removeNodes({direction, removeDelta});
+      }
     }
 
     // Always check to see if we need to add nodes
