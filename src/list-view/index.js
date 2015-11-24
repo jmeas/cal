@@ -45,7 +45,17 @@ _.extend(ListView.prototype, {
   },
 
   _computeIndices({offset, length, min, max, padding}) {
-    var endOffset = offset + length;
+    var endOffset = offset + length - 1;
+
+    // A length of "0" requires that we render nothing. However, the decision
+    // to use an inclusive start and end for our indices prevents us from
+    // rendering nothing without using weird conventions. The simple algorithm
+    // above would cause the endOffset to come before the offset to indicate
+    // rendering nothing.
+    // Rather than doing that, we just always render at least 1 thing, even when
+    // the length requests that we render nothing. The following line provides
+    // this little correction.
+    endOffset = Math.max(offset, endOffset);
 
     return {
       firstIndex: clamp(offset - padding, min, max),

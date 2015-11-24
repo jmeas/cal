@@ -101,7 +101,7 @@ describe('ListView', () => {
           padding: 3
         });
         expect(result.firstIndex).to.equal(7);
-        expect(result.lastIndex).to.equal(16);
+        expect(result.lastIndex).to.equal(15);
       });
     });
 
@@ -115,7 +115,7 @@ describe('ListView', () => {
           padding: 3
         });
         expect(result.firstIndex).to.equal(0);
-        expect(result.lastIndex).to.equal(8);
+        expect(result.lastIndex).to.equal(7);
       });
     });
 
@@ -129,7 +129,7 @@ describe('ListView', () => {
           padding: 3
         });
         expect(result.firstIndex).to.equal(0);
-        expect(result.lastIndex).to.equal(6);
+        expect(result.lastIndex).to.equal(5);
       });
     });
 
@@ -172,6 +172,20 @@ describe('ListView', () => {
         });
         expect(result.firstIndex).to.equal(12);
         expect(result.lastIndex).to.equal(18);
+      });
+    });
+
+    describe('with an offset and padding of 0', () => {
+      it('should return the correct indices, rendering just 1 item', () => {
+        var result = listView._computeIndices({
+          offset: 15,
+          length: 0,
+          min: 0,
+          max: 19,
+          padding: 0
+        });
+        expect(result.firstIndex).to.equal(15);
+        expect(result.lastIndex).to.equal(15);
       });
     });
   });

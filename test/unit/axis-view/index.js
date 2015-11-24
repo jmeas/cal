@@ -26,7 +26,7 @@ describe('AxisView', () => {
         var result = axisView._computeManagerOptions({length: 6});
         expect(result).to.deep.equal({
           firstIndex: 7,
-          lastIndex: 19,
+          lastIndex: 18,
           direction: undefined
         });
       });
@@ -41,7 +41,7 @@ describe('AxisView', () => {
         });
         expect(result).to.deep.equal({
           firstIndex: 0,
-          lastIndex: 9,
+          lastIndex: 8,
           direction: 1
         });
       });
@@ -56,7 +56,7 @@ describe('AxisView', () => {
         });
         expect(result).to.deep.equal({
           firstIndex: 0,
-          lastIndex: 10,
+          lastIndex: 9,
           direction: -1
         });
       });
@@ -71,7 +71,7 @@ describe('AxisView', () => {
         });
         expect(result).to.deep.equal({
           firstIndex: 1,
-          lastIndex: 13,
+          lastIndex: 12,
           direction: 1
         });
       });

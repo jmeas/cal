@@ -23,7 +23,7 @@ _.extend(NodeListManager.prototype, {
 
     // If we have a first index, then that means that we already have children nodes.
     // We use this information to calculate how many we need to add and remove.
-    if (this._firstIndex) {
+    if (!_.isUndefined(this._firstIndex)) {
       backwardDelta = Math.abs(this._firstIndex - firstIndex);
       forwardDelta = Math.abs(this._lastIndex - lastIndex);
       removeDelta = direction > 0 ? backwardDelta : forwardDelta;
@@ -35,6 +35,7 @@ _.extend(NodeListManager.prototype, {
     // that we have rendered, then we do a regular smart update
     if (!_.isUndefined(removeDelta) && removeDelta < currentSize) {
       referenceIndex = direction > 0 ? this._lastIndex : this._firstIndex;
+      clear = false;
       this._removeNodes({direction, removeDelta});
     }
 

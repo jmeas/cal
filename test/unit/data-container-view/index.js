@@ -31,9 +31,9 @@ describe('DataContainerView', () => {
 
         expect(result).to.deep.equal({
           firstXIndex: 17,
-          lastXIndex: 33,
+          lastXIndex: 32,
           firstYIndex: 15,
-          lastYIndex: 40,
+          lastYIndex: 39,
           xDirection: undefined,
           yDirection: undefined
         });
@@ -53,9 +53,9 @@ describe('DataContainerView', () => {
 
         expect(result).to.deep.equal({
           firstXIndex: 0,
-          lastXIndex: 13,
+          lastXIndex: 12,
           firstYIndex: 15,
-          lastYIndex: 40,
+          lastYIndex: 39,
           xDirection: 1,
           yDirection: -1
         });
@@ -75,9 +75,9 @@ describe('DataContainerView', () => {
 
         expect(result).to.deep.equal({
           firstXIndex: 7,
-          lastXIndex: 23,
+          lastXIndex: 22,
           firstYIndex: 0,
-          lastYIndex: 15,
+          lastYIndex: 14,
           xDirection: -1,
           yDirection: 1
         });
@@ -97,9 +97,9 @@ describe('DataContainerView', () => {
 
         expect(result).to.deep.equal({
           firstXIndex: 0,
-          lastXIndex: 14,
+          lastXIndex: 13,
           firstYIndex: 15,
-          lastYIndex: 40,
+          lastYIndex: 39,
           xDirection: 1,
           yDirection: -1
         });
@@ -119,9 +119,9 @@ describe('DataContainerView', () => {
 
         expect(result).to.deep.equal({
           firstXIndex: 7,
-          lastXIndex: 23,
+          lastXIndex: 22,
           firstYIndex: 0,
-          lastYIndex: 16,
+          lastYIndex: 15,
           xDirection: -1,
           yDirection: 1
         });
@@ -143,7 +143,7 @@ describe('DataContainerView', () => {
           firstXIndex: 36,
           lastXIndex: 49,
           firstYIndex: 15,
-          lastYIndex: 40,
+          lastYIndex: 39,
           xDirection: 1,
           yDirection: -1
         });
@@ -163,7 +163,7 @@ describe('DataContainerView', () => {
 
         expect(result).to.deep.equal({
           firstXIndex: 7,
-          lastXIndex: 23,
+          lastXIndex: 22,
           firstYIndex: 25,
           lastYIndex: 49,
           xDirection: -1,

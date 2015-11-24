@@ -94,7 +94,7 @@ describe('NodeListManager', () => {
       it('should only call `_addNodes`', () => {
         nodeListManager.update({
           firstIndex: 10,
-          lastIndex: 15
+          lastIndex: 14
         });
 
         expect(nodeListManager._addNodes).to.have.been.calledOnce;
