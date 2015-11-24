@@ -10,33 +10,6 @@ function NodeListManager(options = {}) {
 }
 
 _.extend(NodeListManager.prototype, {
-  // Populates the axis with the initial batch of elements
-  initialRender({firstIndex, lastIndex}) {
-    if (this.el.children.length) {
-      this._clear();
-    }
-    var totalToAdd = lastIndex - firstIndex + 1;
-    var fragment = document.createDocumentFragment();
-    var el, val, formattedText, absoluteIndex;
-    _.times(totalToAdd, n => {
-      absoluteIndex = firstIndex + n;
-
-      // Get our value from the list, based on index,
-      // then format it according to the format fn
-      val = this.list[absoluteIndex][this.displayProp];
-      formattedText = this.formatFn(val);
-
-      // Pop a node from the pool, then update its properties
-      el = this.pool.pop();
-      el.textContent = formattedText;
-      el.style[this.dim] = `${this.unit * absoluteIndex}px`;
-      fragment.appendChild(el);
-    });
-    this.el.appendChild(fragment);
-    this._firstIndex = firstIndex;
-    this._lastIndex = lastIndex;
-  },
-
   // Updating is a two-part process: removing nodes that have
   // moved too far away, and then adding new nodes that are moving
   // into view
@@ -45,20 +18,34 @@ _.extend(NodeListManager.prototype, {
     if (firstIndex === this._firstIndex && lastIndex === this._lastIndex) {
       return;
     }
-    // If this manager has no indices, then it must be the first render.
-    else if (_.isUndefined(this._firstIndex) || _.isUndefined(this._lastIndex)) {
-      return this.initialRender({firstIndex, lastIndex});
+
+    // We do some inductive reasoning here to determine if this is the first render
+    var initialRender = _.isUndefined(this._firstIndex);
+
+    var backwardDelta, forwardDelta, addDelta, removeDelta, referenceIndex;
+    // On the first render, we update a little differently than if it's a subsequent update
+    if (initialRender) {
+      direction = 1;
+      addDelta = lastIndex - firstIndex + 1;
+      // This is related to the initial index weirdness in the addNodes loop
+      referenceIndex = firstIndex - 1;
+    } else {
+      backwardDelta = Math.abs(this._firstIndex - firstIndex);
+      forwardDelta = Math.abs(this._lastIndex - lastIndex);
+      removeDelta = direction > 0 ? backwardDelta : forwardDelta;
+      addDelta = direction > 0 ? forwardDelta : backwardDelta;
+      referenceIndex = direction > 0 ? this._lastIndex : this._firstIndex;
     }
-
-    var backwardDelta = Math.abs(this._firstIndex - firstIndex);
-    var forwardDelta = Math.abs(this._lastIndex - lastIndex);
-
-    var removeDelta = direction > 0 ? backwardDelta : forwardDelta;
-    var addDelta = direction > 0 ? forwardDelta : backwardDelta;
 
     // Otherwise, we do an intelligent update by adding and removing nodes
     this._removeNodes({direction, removeDelta});
-    this._addNodes({direction, addDelta});
+    this._addNodes({
+      direction,
+      addDelta,
+      clear: initialRender,
+      referenceIndex
+    });
+
     this._firstIndex = firstIndex;
     this._lastIndex = lastIndex;
   },
@@ -92,15 +79,20 @@ _.extend(NodeListManager.prototype, {
     });
   },
 
-  _addNodes({direction, addDelta}) {
+  _addNodes({direction, addDelta, firstIndex, lastIndex, clear, referenceIndex}) {
     // If there's nothing to add, then bail
     if (!addDelta) { return; }
 
+    // If we need to clear house, then we do so
+    if (clear) {
+      this._clear();
+    }
+
     // Anchor ourselves based on the direction that we're moving toward
-    var anchor = direction > 0 ? this._lastIndex : this._firstIndex;
+    var anchor = referenceIndex;
 
     var fragment = document.createDocumentFragment();
-    var el, formattedText, val, absoluteIndex;
+    var el, absoluteIndex;
     _.times(addDelta, n => {
       // When we're prepending the nodes, we need to add them in reverse order
       if (direction < 0) {
@@ -115,13 +107,7 @@ _.extend(NodeListManager.prototype, {
 
       absoluteIndex = anchor + (n * direction);
 
-      // Get our value from the list, based on index,
-      // then format it according to the format fn
-      val = this.list[absoluteIndex][this.displayProp];
-      formattedText = this.formatFn(val);
-      el = this.pool.pop();
-      el.textContent = formattedText;
-      el.style[this.dim] = `${this.unit * absoluteIndex}px`;
+      el = this._createElementByIndex(absoluteIndex);
       fragment.appendChild(el);
     });
     // Although the order of the nodes doesn't matter, it's not much
@@ -131,6 +117,36 @@ _.extend(NodeListManager.prototype, {
     } else {
       this.el.insertBefore(fragment, this.el.firstChild);
     }
+  },
+
+  // // Populates the axis with the initial batch of elements
+  // initialRender({firstIndex, lastIndex}) {
+  //   if (this.el.children.length) {
+  //     this._clear();
+  //   }
+  //   var totalToAdd = lastIndex - firstIndex + 1;
+  //   var fragment = document.createDocumentFragment();
+  //   var el, absoluteIndex;
+
+  //   _.times(totalToAdd, n => {
+  //     absoluteIndex = firstIndex + n;
+  //     el = this._createElementByIndex(absoluteIndex);
+  //     fragment.appendChild(el);
+  //   });
+
+  //   this.el.appendChild(fragment);
+  //   this._firstIndex = firstIndex;
+  //   this._lastIndex = lastIndex;
+  // },
+
+  // Returns an element representing the element at `index`
+  _createElementByIndex(index) {
+    var value = this.list[index][this.displayProp];
+    value = this.formatFn(value);
+    var el = this.pool.pop();
+    el.textContent = value;
+    el.style[this.dim] = `${this.unit * index}px`;
+    return el;
   }
 });
 
