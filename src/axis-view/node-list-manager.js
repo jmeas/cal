@@ -35,10 +35,12 @@ _.extend(NodeListManager.prototype, {
       removeDelta = direction > 0 ? backwardDelta : forwardDelta;
       addDelta = direction > 0 ? forwardDelta : backwardDelta;
       referenceIndex = direction > 0 ? this._lastIndex : this._firstIndex;
+
+      // We only need to remove nodes when it's not the initial render
+      this._removeNodes({direction, removeDelta});
     }
 
-    // Otherwise, we do an intelligent update by adding and removing nodes
-    this._removeNodes({direction, removeDelta});
+    // Always check to see if we need to add nodes
     this._addNodes({
       direction,
       addDelta,
@@ -79,7 +81,7 @@ _.extend(NodeListManager.prototype, {
     });
   },
 
-  _addNodes({direction, addDelta, firstIndex, lastIndex, clear, referenceIndex}) {
+  _addNodes({direction, addDelta, clear, referenceIndex}) {
     // If there's nothing to add, then bail
     if (!addDelta) { return; }
 
@@ -118,26 +120,6 @@ _.extend(NodeListManager.prototype, {
       this.el.insertBefore(fragment, this.el.firstChild);
     }
   },
-
-  // // Populates the axis with the initial batch of elements
-  // initialRender({firstIndex, lastIndex}) {
-  //   if (this.el.children.length) {
-  //     this._clear();
-  //   }
-  //   var totalToAdd = lastIndex - firstIndex + 1;
-  //   var fragment = document.createDocumentFragment();
-  //   var el, absoluteIndex;
-
-  //   _.times(totalToAdd, n => {
-  //     absoluteIndex = firstIndex + n;
-  //     el = this._createElementByIndex(absoluteIndex);
-  //     fragment.appendChild(el);
-  //   });
-
-  //   this.el.appendChild(fragment);
-  //   this._firstIndex = firstIndex;
-  //   this._lastIndex = lastIndex;
-  // },
 
   // Returns an element representing the element at `index`
   _createElementByIndex(index) {

@@ -54,63 +54,6 @@ describe('NodeListManager', () => {
     });
   });
 
-  describe('_initialRender', () => {
-    beforeEach(() => {
-      nodeListManager = new NodeListManager({
-        el: document.createElement('div'),
-        pool: pool,
-        displayProp: 'name',
-        list: Array(20).fill({
-          name: 'sandwich'
-        })
-      });
-
-      stub(nodeListManager, '_clear');
-    });
-
-    describe('when there are no child elements', () => {
-      it('should not call clear', () => {
-        nodeListManager.initialRender({
-          firstIndex: 0,
-          lastIndex: 10
-        });
-
-        expect(nodeListManager._clear).to.not.have.been.called;
-      });
-    });
-
-    describe('when there are child elements', () => {
-      it('should call clear', () => {
-        nodeListManager.el.appendChild(document.createElement('div'));
-
-        nodeListManager.initialRender({
-          firstIndex: 0,
-          lastIndex: 10
-        });
-
-        expect(nodeListManager._clear).to.have.been.calledOnce;
-      });
-    });
-
-    describe('when called to render 0 to 9', () => {
-      beforeEach(() => {
-        nodeListManager.initialRender({
-          firstIndex: 0,
-          lastIndex: 9
-        });
-      });
-
-      it('should append 10 children', () => {
-        expect(nodeListManager.el.children).to.have.length(10);
-      });
-
-      it('should update the internal indices', () => {
-        expect(nodeListManager._firstIndex).to.equal(0);
-        expect(nodeListManager._lastIndex).to.equal(9);
-      });
-    });
-  });
-
   describe('_update', () => {
     beforeEach(() => {
       nodeListManager = new NodeListManager({
@@ -124,7 +67,6 @@ describe('NodeListManager', () => {
 
       stub(nodeListManager, '_addNodes');
       stub(nodeListManager, '_removeNodes');
-      stub(nodeListManager, 'initialRender');
     });
 
     describe('when the indices are unchanged', () => {
@@ -139,20 +81,19 @@ describe('NodeListManager', () => {
 
         expect(nodeListManager._addNodes).to.not.have.been.called;
         expect(nodeListManager._removeNodes).to.not.have.been.called;
-        expect(nodeListManager.initialRender).to.not.have.been.called;
       });
     });
 
+    // change: check for the correct arguments
     describe('when there are no indices to begin with', () => {
-      it('should only call `initialRender`', () => {
+      it('should only call `_addNodes`', () => {
         nodeListManager.update({
           firstIndex: 10,
           lastIndex: 15
         });
 
-        expect(nodeListManager._addNodes).to.not.have.been.called;
+        expect(nodeListManager._addNodes).to.have.been.calledOnce;
         expect(nodeListManager._removeNodes).to.not.have.been.called;
-        expect(nodeListManager.initialRender).to.have.been.calledOnce;
       });
     });
 
@@ -172,7 +113,9 @@ describe('NodeListManager', () => {
         expect(nodeListManager._addNodes).have.been.calledOnce;
         expect(nodeListManager._addNodes).to.have.been.calledWithExactly({
           direction: 1,
-          addDelta: 1
+          addDelta: 1,
+          clear: false,
+          referenceIndex: 15
         });
       });
 
@@ -201,7 +144,9 @@ describe('NodeListManager', () => {
         expect(nodeListManager._addNodes).have.been.calledOnce;
         expect(nodeListManager._addNodes).to.have.been.calledWithExactly({
           direction: 1,
-          addDelta: 1
+          addDelta: 1,
+          clear: false,
+          referenceIndex: 18
         });
       });
 
@@ -230,7 +175,9 @@ describe('NodeListManager', () => {
         expect(nodeListManager._addNodes).have.been.calledOnce;
         expect(nodeListManager._addNodes).to.have.been.calledWithExactly({
           direction: -1,
-          addDelta: 1
+          addDelta: 1,
+          clear: false,
+          referenceIndex: 1
         });
       });
 
@@ -259,7 +206,9 @@ describe('NodeListManager', () => {
         expect(nodeListManager._addNodes).have.been.calledOnce;
         expect(nodeListManager._addNodes).to.have.been.calledWithExactly({
           direction: 1,
-          addDelta: 5
+          addDelta: 5,
+          clear: false,
+          referenceIndex: 10
         });
       });
 
@@ -289,7 +238,9 @@ describe('NodeListManager', () => {
           expect(nodeListManager._addNodes).have.been.calledOnce;
           expect(nodeListManager._addNodes).to.have.been.calledWithExactly({
             direction: 1,
-            addDelta: 1
+            addDelta: 1,
+            clear: false,
+            referenceIndex: 10
           });
         });
 
@@ -318,7 +269,9 @@ describe('NodeListManager', () => {
           expect(nodeListManager._addNodes).have.been.calledOnce;
           expect(nodeListManager._addNodes).to.have.been.calledWithExactly({
             direction: 1,
-            addDelta: 0
+            addDelta: 0,
+            clear: false,
+            referenceIndex: 10
           });
         });
 
@@ -347,7 +300,9 @@ describe('NodeListManager', () => {
           expect(nodeListManager._addNodes).have.been.calledOnce;
           expect(nodeListManager._addNodes).to.have.been.calledWithExactly({
             direction: 1,
-            addDelta: 5
+            addDelta: 5,
+            clear: false,
+            referenceIndex: 10
           });
         });
 
@@ -465,7 +420,9 @@ describe('NodeListManager', () => {
       it('should not add anything', () => {
         nodeListManager._addNodes({
           direction: 1,
-          addDelta: 0
+          addDelta: 0,
+          referenceIndex: 5,
+          clear: false
         });
 
         expect(nodeListManager.el.children).to.have.length(0);
@@ -475,11 +432,11 @@ describe('NodeListManager', () => {
     describe('forward', () => {
       describe('when in the middle of the list, adding 5', () => {
         beforeEach(() => {
-          nodeListManager._firstIndex = 5;
-          nodeListManager._lastIndex = 10;
           nodeListManager._addNodes({
             direction: 1,
-            addDelta: 5
+            addDelta: 5,
+            referenceIndex: 5,
+            clear: false
           });
         });
 
@@ -490,11 +447,11 @@ describe('NodeListManager', () => {
 
       describe('when near the end of the list, adding 1', () => {
         beforeEach(() => {
-          nodeListManager._firstIndex = 5;
-          nodeListManager._lastIndex = 18;
           nodeListManager._addNodes({
             direction: 1,
-            addDelta: 1
+            addDelta: 1,
+            referenceIndex: 5,
+            clear: false
           });
         });
 
