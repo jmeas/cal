@@ -19,43 +19,39 @@ _.extend(NodeListManager.prototype, {
       return;
     }
 
-    // We do some inductive reasoning here to determine if this is the first render
-    var initialRender = _.isUndefined(this._firstIndex);
+    var backwardDelta, forwardDelta, addDelta, removeDelta, referenceIndex, clear, currentSize;
 
-    var backwardDelta, forwardDelta, addDelta, removeDelta, referenceIndex;
-    // On the first render, we update a little differently than if it's a subsequent update
-    if (initialRender) {
-      direction = 1;
-      addDelta = lastIndex - firstIndex + 1;
-      // This is related to the initial index weirdness in the addNodes loop
-      referenceIndex = firstIndex - 1;
-    } else {
+    // If we have a first index, then that means that we already have children nodes.
+    // We use this information to calculate how many we need to add and remove.
+    if (this._firstIndex) {
       backwardDelta = Math.abs(this._firstIndex - firstIndex);
       forwardDelta = Math.abs(this._lastIndex - lastIndex);
       removeDelta = direction > 0 ? backwardDelta : forwardDelta;
       addDelta = direction > 0 ? forwardDelta : backwardDelta;
+      currentSize = this._lastIndex - this._firstIndex + 1;
+    }
+
+    // If we have a `removeDelta`, and it's less than the total number of nodes
+    // that we have rendered, then we do a regular smart update
+    if (!_.isUndefined(removeDelta) && removeDelta < currentSize) {
       referenceIndex = direction > 0 ? this._lastIndex : this._firstIndex;
+      this._removeNodes({direction, removeDelta});
+    }
 
-      var currentSize = this._lastIndex - this._firstIndex + 1;
-      if (removeDelta > currentSize) {
-        initialRender = true;
-        referenceIndex = firstIndex - 1;
-        direction = 1;
-        addDelta = lastIndex - firstIndex + 1;
-      }
-
-      // We only need to remove nodes when it's not the initial render, and
-      // if the size of the removal is less than the total number of elements.
-      else {
-        this._removeNodes({direction, removeDelta});
-      }
+    // Otherwise, we set ourselves up for a fresh update. This handles both the initial
+    // render and subsequent "big renders" which draw a whole new list
+    else {
+      clear = true;
+      referenceIndex = firstIndex - 1;
+      direction = 1;
+      addDelta = lastIndex - firstIndex + 1;
     }
 
     // Always check to see if we need to add nodes
     this._addNodes({
       direction,
       addDelta,
-      clear: initialRender,
+      clear,
       referenceIndex
     });
 
