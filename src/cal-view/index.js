@@ -37,7 +37,7 @@ _.extend(CalView.prototype, {
       list: this.timeline,
       unit: config.yAxisCellHeight,
       poolSize: 80,
-      padding: 0,
+      padding: 15,
       initialIndex: offsets.back,
       displayProp: 'time',
       dimension: 'top',
