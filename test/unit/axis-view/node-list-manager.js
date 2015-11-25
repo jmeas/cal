@@ -411,13 +411,17 @@ describe('NodeListManager', () => {
 
   describe('_addNodes', () => {
     beforeEach(() => {
+      var list = _.map(Array(20), (v, i) => {
+        return {
+          name: i
+        };
+      });
+
       nodeListManager = new NodeListManager({
         el: document.createElement('div'),
         pool: pool,
         displayProp: 'name',
-        list: Array(20).fill({
-          name: 'sandwich'
-        })
+        list
       });
     });
 
@@ -431,6 +435,21 @@ describe('NodeListManager', () => {
         });
 
         expect(nodeListManager.el.children).to.have.length(0);
+      });
+    });
+
+    describe('passing clear:true', () => {
+      it('call clear', () => {
+        stub(nodeListManager, '_clear');
+
+        nodeListManager._addNodes({
+          direction: 1,
+          addDelta: 1,
+          referenceIndex: 5,
+          clear: true
+        });
+
+        expect(nodeListManager._clear).to.have.been.calledOnce;
       });
     });
 
@@ -448,6 +467,14 @@ describe('NodeListManager', () => {
         it('should add 5 new items', () => {
           expect(nodeListManager.el.children).to.have.length(5);
         });
+
+        it('should render the correct items from the list', () => {
+          expect(nodeListManager.el.children[0].textContent).to.equal('5');
+          expect(nodeListManager.el.children[1].textContent).to.equal('6');
+          expect(nodeListManager.el.children[2].textContent).to.equal('7');
+          expect(nodeListManager.el.children[3].textContent).to.equal('8');
+          expect(nodeListManager.el.children[4].textContent).to.equal('9');
+        });
       });
 
       describe('when near the end of the list, adding 1', () => {
@@ -455,13 +482,61 @@ describe('NodeListManager', () => {
           nodeListManager._addNodes({
             direction: 1,
             addDelta: 1,
-            referenceIndex: 5,
+            referenceIndex: 19,
             clear: false
           });
         });
 
         it('should add 1 new item', () => {
           expect(nodeListManager.el.children).to.have.length(1);
+        });
+
+        it('should render the correct items from the list', () => {
+          expect(nodeListManager.el.children[0].textContent).to.equal('19');
+        });
+      });
+    });
+
+    describe('backward', () => {
+      describe('when in the middle of the list, adding 5', () => {
+        beforeEach(() => {
+          nodeListManager._addNodes({
+            direction: -1,
+            addDelta: 5,
+            referenceIndex: 9,
+            clear: false
+          });
+        });
+
+        it('should add 5 new items', () => {
+          expect(nodeListManager.el.children).to.have.length(5);
+        });
+
+        it('should render the correct items from the list', () => {
+          expect(nodeListManager.el.children[0].textContent).to.equal('5');
+          expect(nodeListManager.el.children[1].textContent).to.equal('6');
+          expect(nodeListManager.el.children[2].textContent).to.equal('7');
+          expect(nodeListManager.el.children[3].textContent).to.equal('8');
+          expect(nodeListManager.el.children[4].textContent).to.equal('9');
+        });
+      });
+
+      describe('when near the beginning of the list, adding 1', () => {
+        beforeEach(() => {
+          nodeListManager._addNodes({
+            direction: -1,
+            addDelta: 1,
+            referenceIndex: 0,
+            clear: false
+          });
+        });
+
+        it('should add 1 new item', () => {
+          expect(nodeListManager.el.children).to.have.length(1);
+        });
+
+        it('should render the correct items from the list', () => {
+          expect(nodeListManager.el.children[0].textContent).to.equal('0');
         });
       });
     });
