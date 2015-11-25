@@ -18,25 +18,40 @@ _.extend(EmployeeNodeManager.prototype, {
       return;
     }
 
-    // If this manager has no indices, then it must be the first render.
-    else if (_.isUndefined(this._firstIndex) || _.isUndefined(this._lastIndex)) {
-      return this._initialRender({firstIndex, lastIndex});
+    var backwardDelta, forwardDelta, addDelta, removeDelta, referenceIndex, clear, currentSize;
+
+    if (!_.isUndefined(this._firstIndex)) {
+      backwardDelta = Math.abs(this._firstIndex - firstIndex);
+      forwardDelta = Math.abs(this._lastIndex - lastIndex);
+      removeDelta = direction > 0 ? backwardDelta : forwardDelta;
+      addDelta = direction > 0 ? forwardDelta : backwardDelta;
+      currentSize = this._lastIndex - this._firstIndex + 1;
     }
 
-    var totalSize = lastIndex - firstIndex + 1;
-    var backwardDelta = Math.abs(this._firstIndex - firstIndex);
-    var forwardDelta = Math.abs(this._lastIndex - lastIndex);
+    if (!_.isUndefined(removeDelta) && removeDelta < currentSize) {
+      referenceIndex = direction > 0 ? this._lastIndex : this._firstIndex;
+      // Correct our index according to the direction that we're moving in. This
+      // won't go over our limits because we check for the size of the `addDelta`, which
+      // is determined by maths up in the AxisView, before we ever use this value.
+      referenceIndex += direction;
+      clear = false;
+      this._removeNodes({direction, removeDelta});
+    }
 
-    // if (backwardDelta > this._children.length) {
-    //   var u = this.employee.utilizations;
-    //   console.log(':', u.length, this._children.length, this._firstIndex, firstIndex);
-    // }
+    else {
+      clear = true;
+      referenceIndex = firstIndex;
+      direction = 1;
+      addDelta = lastIndex - firstIndex + 1;
+    }
 
-    var removeDelta = direction > 0 ? backwardDelta : forwardDelta;
-    var addDelta = direction > 0 ? forwardDelta : backwardDelta;
-
-    // this._removeNodes({direction, removeDelta});
-    this._addNodes({direction, addDelta});
+    // Always check to see if we need to add nodes
+    this._addNodes({
+      direction,
+      addDelta,
+      clear,
+      referenceIndex
+    });
 
     this._firstIndex = firstIndex;
     this._lastIndex = lastIndex;
@@ -48,6 +63,9 @@ _.extend(EmployeeNodeManager.prototype, {
       c.el.remove();
     });
     this._children = [];
+    // Reset our indices so that the next render is a fresh one
+    this._firstIndex = undefined;
+    this._lastIndex = undefined;
   },
 
   // These indices keep track of where we begin and end
@@ -57,12 +75,10 @@ _.extend(EmployeeNodeManager.prototype, {
   _removeNodes({direction, removeDelta}) {
     // If we have no nodes, then there's nothing to remove!
     if (!this._children.length) { return; }
-    var length = this._children.length;
+
     var targetIndex, relativeIndex;
-    // console.log('THE LENGTH', this._children.length, removeDelta);
     _.times(removeDelta, n => {
-      n = direction < 0 ? this._children.length - 1 : 0;
-      // console.log('wat', n, this._children.length);
+      n = direction > 0 ? 0 : this._children.length - 1;
       // Remove the node from the page
       this._children[n].el.remove();
       // Remove the view from the children array
@@ -70,22 +86,35 @@ _.extend(EmployeeNodeManager.prototype, {
     });
   },
 
-  _addNodes({direction, addDelta}) {},
+  _addNodes({direction, addDelta, referenceIndex, clear}) {
+    if (!addDelta) { return; }
 
-  _initialRender({firstIndex, lastIndex}) {
-    var size = lastIndex - firstIndex + 1;
+    // If we need to clear house, then we do so
+    if (clear) {
+      this.clear();
+    }
+
     var fragment = document.createDocumentFragment();
-    _.times(size, n => {
-      n += firstIndex;
-      var u = this.employee.utilizations[n];
-      var uView = new UtilizationView(u, this.index);
-      this._children.push(uView);
-      fragment.appendChild(uView.el);
-    });
-    this.el.appendChild(fragment);
+    var view, absoluteIndex;
+    _.times(addDelta, n => {
+      // When we're prepending the nodes, we need to add them in reverse order.
+      // Note that because `n` is 0-indexed, and `addDelta` is not, we must
+      // correct the value by subtracting 1
+      if (direction < 0) {
+        n = addDelta - n - 1;
+      }
 
-    this._firstIndex = firstIndex;
-    this._lastIndex = lastIndex;
+      absoluteIndex = referenceIndex + (n * direction);
+      view = this._createChildView(absoluteIndex);
+      this._children.push(view);
+      fragment.appendChild(view.el);
+    });
+
+    if (direction > 0) {
+      this.el.appendChild(fragment);
+    } else {
+      this.el.insertBefore(fragment, this.el.firstChild);
+    }
   },
 
   // The indices that we get from ManagerManager are not mapped to our utilization
@@ -103,6 +132,11 @@ _.extend(EmployeeNodeManager.prototype, {
       firstIndex: firstUtilizationIndex,
       lastIndex: lastUtilizationIndex
     };
+  },
+
+  _createChildView(index) {
+    var utilization = this.employee.utilizations[index];
+    return new UtilizationView(utilization, this.index);
   }
 });
 
