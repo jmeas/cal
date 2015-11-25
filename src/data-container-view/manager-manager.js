@@ -15,10 +15,10 @@ _.extend(ManagerManager.prototype, {
     // If nothing has been updated, then bail
     if (!xChanged && !yChanged) { return; }
 
-    var backwardDelta, forwardDelta, addDelta,
-      addReferenceIndex, removeReferenceIndex,
-      removeDelta, clear, currentSize;
-    if (_.isUndefined(this._firstXIndex)) {
+    var backwardDelta, forwardDelta,
+      referenceIndex, removeDelta, clear, currentSize;
+
+    if (!_.isUndefined(this._firstXIndex)) {
       backwardDelta = Math.abs(this._firstXIndex - firstXIndex);
       forwardDelta = Math.abs(this._lastXIndex - lastXIndex);
       removeDelta = xDirection > 0 ? backwardDelta : forwardDelta;
@@ -26,27 +26,25 @@ _.extend(ManagerManager.prototype, {
     }
 
     if (!_.isUndefined(removeDelta) && removeDelta < currentSize) {
-      removeReferenceIndex = xDirection > 0 ? this._lastXIndex : this._firstXIndex;
-      addReferenceIndex = removeReferenceIndex + xDirection;
+      referenceIndex = xDirection < 0 ? this._lastXIndex : this._firstXIndex;
       clear = false;
       this._broadcastDelete({
         direction: xDirection,
         removeDelta,
-        referenceIndex: removeReferenceIndex
+        referenceIndex
       });
     }
 
     else {
       clear = true;
       xDirection = 1;
-      addReferenceIndex = firstXIndex;
-      addDelta = lastXIndex - firstXIndex + 1;
     }
 
     // Broadcast our update.
     this._broadcastUpdate({
       clear,
-      addDelta,
+      firstXIndex,
+      lastXIndex,
       xDirection,
       firstYIndex,
       lastYIndex,
@@ -82,13 +80,16 @@ _.extend(ManagerManager.prototype, {
 
   // This causes the employee node managers that have scrolled out of
   // view to clear all of their cells.
-  _broadcastDelete({direction, removeDelta, removeReferenceIndex}) {
+  _broadcastDelete({direction, removeDelta, referenceIndex}) {
     var targetIndex, relativeIndex;
     _.times(removeDelta, n => {
+      // When we're prepending the nodes, we need to add them in reverse order.
+      // Note that because `n` is 0-indexed, and `removeDelta` is not, we must
+      // correct the value by subtracting 1
       if (direction < 0) {
-        n = removeDelta - n;
+        n = removeDelta - n - 1;
       }
-      targetIndex = removeReferenceIndex + (n * direction);
+      targetIndex = referenceIndex + (n * direction);
       this._managers[targetIndex].clear();
     });
   },
