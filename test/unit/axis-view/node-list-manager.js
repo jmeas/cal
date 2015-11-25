@@ -89,16 +89,26 @@ describe('NodeListManager', () => {
       });
     });
 
-    // change: check for the correct arguments
     describe('when there are no indices to begin with', () => {
-      it('should only call `_addNodes`', () => {
+      beforeEach(() => {
         nodeListManager.update({
           firstIndex: 10,
           lastIndex: 14
         });
+      });
 
-        expect(nodeListManager._addNodes).to.have.been.calledOnce;
+      it('should not call `_removeNodes`', () => {
         expect(nodeListManager._removeNodes).to.not.have.been.called;
+      });
+
+      it('should call `_addNodes`, passing the correct arguments', () => {
+        expect(nodeListManager._addNodes).to.have.been.calledOnce;
+        expect(nodeListManager._addNodes).to.have.been.calledWithExactly({
+          referenceIndex: 10,
+          direction: 1,
+          clear: true,
+          addDelta: 5
+        });
       });
     });
 
