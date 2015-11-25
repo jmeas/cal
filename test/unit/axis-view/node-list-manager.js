@@ -120,7 +120,7 @@ describe('NodeListManager', () => {
           direction: 1,
           addDelta: 1,
           clear: false,
-          referenceIndex: 15
+          referenceIndex: 16
         });
       });
 
@@ -151,7 +151,7 @@ describe('NodeListManager', () => {
           direction: 1,
           addDelta: 1,
           clear: false,
-          referenceIndex: 18
+          referenceIndex: 19
         });
       });
 
@@ -182,7 +182,7 @@ describe('NodeListManager', () => {
           direction: -1,
           addDelta: 1,
           clear: false,
-          referenceIndex: 1
+          referenceIndex: 0
         });
       });
 
@@ -213,7 +213,7 @@ describe('NodeListManager', () => {
           direction: 1,
           addDelta: 5,
           clear: false,
-          referenceIndex: 10
+          referenceIndex: 11
         });
       });
 
@@ -245,7 +245,7 @@ describe('NodeListManager', () => {
             direction: 1,
             addDelta: 1,
             clear: false,
-            referenceIndex: 10
+            referenceIndex: 11
           });
         });
 
@@ -276,7 +276,7 @@ describe('NodeListManager', () => {
             direction: 1,
             addDelta: 0,
             clear: false,
-            referenceIndex: 10
+            referenceIndex: 11
           });
         });
 
@@ -307,7 +307,7 @@ describe('NodeListManager', () => {
             direction: 1,
             addDelta: 5,
             clear: false,
-            referenceIndex: 10
+            referenceIndex: 11
           });
         });
 
