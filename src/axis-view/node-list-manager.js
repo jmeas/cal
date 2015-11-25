@@ -35,6 +35,10 @@ _.extend(NodeListManager.prototype, {
     // that we have rendered, then we do a regular smart update
     if (!_.isUndefined(removeDelta) && removeDelta < currentSize) {
       referenceIndex = direction > 0 ? this._lastIndex : this._firstIndex;
+      // Correct our index according to the direction that we're moving in. This
+      // won't go over our limits because we check for the size of the `addDelta`, which
+      // is determined by maths up in the AxisView, before we ever use this value.
+      referenceIndex += direction;
       clear = false;
       this._removeNodes({direction, removeDelta});
     }
@@ -43,7 +47,7 @@ _.extend(NodeListManager.prototype, {
     // render and subsequent "big renders" which draw a whole new list
     else {
       clear = true;
-      referenceIndex = firstIndex - 1;
+      referenceIndex = firstIndex;
       direction = 1;
       addDelta = lastIndex - firstIndex + 1;
     }
@@ -98,24 +102,17 @@ _.extend(NodeListManager.prototype, {
       this._clear();
     }
 
-    // Anchor ourselves based on the direction that we're moving toward
-    var anchor = referenceIndex;
-
     var fragment = document.createDocumentFragment();
     var el, absoluteIndex;
     _.times(addDelta, n => {
-      // When we're prepending the nodes, we need to add them in reverse order
+      // When we're prepending the nodes, we need to add them in reverse order.
+      // Note that because `n` is 0-indexed, and `addDelta` is not, we must
+      // correct the value by subtracting 1
       if (direction < 0) {
-        n = addDelta - n;
-      }
-      // If we're adding the nodes, then we need to add one to make the
-      // algorithm work. Gotta figure out why this is, and refactor
-      // the code to be a little less ad hoc.
-      else {
-        n++;
+        n = addDelta - n - 1;
       }
 
-      absoluteIndex = anchor + (n * direction);
+      absoluteIndex = referenceIndex + (n * direction);
 
       el = this._createElementByIndex(absoluteIndex);
       fragment.appendChild(el);
