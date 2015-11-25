@@ -124,8 +124,13 @@ main {
 
 .cell {
   box-sizing: border-box;
-  padding: 5px;
   position: absolute;
   font-size: 12px;
+}
+
+.cell span {
+  position: absolute;
+  left: 5px;
+  top: 5px;
 }
 
