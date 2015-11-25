@@ -355,5 +355,38 @@ describe('ManagerManager', () => {
         });
       });
     });
+
+    describe('when there indices set, and it moves very far forward', () => {
+      beforeEach(() => {
+        managerManager._firstXIndex = 0;
+        managerManager._lastXIndex = 1;
+
+        managerManager.update({
+          firstXIndex: 5,
+          lastXIndex: 5,
+          firstYIndex: 2,
+          lastYIndex: 3,
+          xDirection: 1,
+          yDirection: -1,
+        });
+      });
+
+      it('should not call broadcastDelete, as it will clear the existing managers', () => {
+        expect(managerManager._broadcastDelete).to.have.not.been.called;
+      });
+
+      it('should call broadcastUpdate with the correct args', () => {
+        expect(managerManager._broadcastUpdate).to.have.been.calledOnce;
+        expect(managerManager._broadcastUpdate).to.have.been.calledWithExactly({
+          clear: true,
+          firstXIndex: 5,
+          lastXIndex: 5,
+          xDirection: 1,
+          yDirection: -1,
+          firstYIndex: 2,
+          lastYIndex: 3
+        });
+      });
+    });
   });
 });
