@@ -5,7 +5,7 @@ const dateMap = {
   weeks: 7
 };
 
-export default function({ referenceDate, back, forward, scale = 'days' }) {
+export default function({ referenceDate, back, forward, scale }) {
   // The "1" here accounts for the referenceDate itself.
   var length = back + forward + 1;
   // The number of days that we add for the scale
