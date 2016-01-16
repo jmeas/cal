@@ -13,6 +13,18 @@ _.extend(EmployeeNodeManager.prototype, {
     firstIndex = indices.firstIndex;
     lastIndex = indices.lastIndex;
 
+    // When the indices are the same, it means that we should
+    // render nothing. So we clear shop and return.
+    if (firstIndex === lastIndex) {
+      this.clear();
+      this._firstIndex = firstIndex;
+      this._lastIndex = lastIndex;
+      return;
+    }
+
+    // Subtract the last index
+    lastIndex -= 1;
+
     // Nothing to update if the indices are unchanged
     if (firstIndex === this._firstIndex && lastIndex === this._lastIndex) {
       return;
